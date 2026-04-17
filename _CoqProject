@@ -1,0 +1,66 @@
+-Q framework ""
+-Q distinction ""
+-Q results ""
+
+-arg -native-compiler -arg no
+
+# ============================================================
+# Layer 0 — framework: Existence + Computable + Iterable
+# ============================================================
+
+framework/Existence.v
+framework/Computable.v
+framework/Iterable.v
+framework/ExternalTime.v
+framework/LatticeExternalTimed.v
+framework/ExistenceMorphism.v
+framework/ExistenceProduct.v
+framework/ExistencePullback.v
+framework/ExistencePushout.v
+
+# ============================================================
+# Layer 1 — instances
+# ============================================================
+
+distinction/YouAndMe.v
+distinction/ConsistencyModelPD.v
+distinction/LatticeModel.v
+distinction/HashModel.v
+distinction/CounterMachine.v
+distinction/PolyModel.v
+distinction/RealIterator.v
+distinction/SKIModel.v
+distinction/EpsilonDelta.v
+distinction/SemilatticeInstances.v
+distinction/RationalRep.v
+distinction/CauchyReal.v
+
+# ============================================================
+# Layer 2 — results (functors + per-instance tests)
+# ============================================================
+
+results/Trichotomy.v
+results/FrameworkRice.v
+results/FrameworkRiceCost.v
+results/FrameworkIrreversibility.v
+
+results/TrichotomyTest.v
+results/FrameworkRiceTest.v
+results/FrameworkRiceCostTest.v
+results/MorphismTest.v
+results/PullbackTest.v
+results/PullbackLatHashTest.v
+results/PushoutTest.v
+results/RationalRepTest.v
+results/CauchyRealTest.v
+results/RationalToCauchyMorphism.v
+results/RationalCauchyProduct.v
+results/RationalCauchyPullback.v
+results/RationalCauchyPushout.v
+results/RationalCauchyFactorization.v
+results/CauchyLimits.v
+
+results/SATLowerBound.v
+results/ScaleInvariantCost.v
+results/FrameworkHalting.v
+results/ExistenceHalting.v

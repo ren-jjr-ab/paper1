@@ -1,0 +1,252 @@
+==================================================
+  Token Arbitrariness Demo
+  Same program, different budget, different tokens.
+==================================================
+
+--- Collatz(27) ---
+  for (;;) { if (a == 1) break; a = (a%2==0) ? a/2 : 3*a+1; }
+
+  Budget: bits=8, intervals=1, steps=200
+    step    0:       27    {27}    mem=2B  merges=0  
+    step    1:       82    [27, 82]    mem=2B  merges=1  <- LOST(+54)
+    step    2:       41    [27, 82]    mem=2B  merges=1  
+    step    3:      124    [27, 124]    mem=2B  merges=2  <- LOST(+41)
+    step    4:       62    [27, 124]    mem=2B  merges=2  
+    step    5:       31    [27, 124]    mem=2B  merges=2  
+    step    6:       94    [27, 124]    mem=2B  merges=2  
+    step    7:       47    [27, 124]    mem=2B  merges=2  
+    step    8:      142    [27, 142]    mem=2B  merges=3  <- LOST(+17)
+    step    9:       71    [27, 142]    mem=2B  merges=3  
+    step   10:      214    [27, 214]    mem=2B  merges=4  <- LOST(+71)
+    step   11:      107    [27, 214]    mem=2B  merges=4  
+
+  Result: UNKNOWN  -- overflow at step 12: 107 -> 322 exceeds 8 bits
+  Tokens(merges): 4  |  Phantoms: 183  |  Peak memory: 2B
+
+  Budget: bits=8, intervals=4, steps=200
+    step    0:       27    {27}    mem=2B  merges=0  
+    step    1:       82    {27} U {82}    mem=4B  merges=0  
+    step    2:       41    {27} U {41} U {82}    mem=6B  merges=0  
+    step    3:      124    {27} U {41} U {82} U {124}    mem=8B  merges=0  
+    step    4:       62    [27, 41] U {62} U {82} U {124}    mem=8B  merges=1  <- LOST(+13)
+    step    5:       31    [27, 41] U {62} U {82} U {124}    mem=8B  merges=1  
+    step    6:       94    [27, 41] U {62} U [82, 94] U {124}    mem=8B  merges=2  <- LOST(+11)
+    step    7:       47    [27, 47] U {62} U [82, 94] U {124}    mem=8B  merges=3  <- LOST(+5)
+    step    8:      142    [27, 62] U [82, 94] U {124} U {142}    mem=8B  merges=4  <- LOST(+14)
+    step    9:       71    [27, 71] U [82, 94] U {124} U {142}    mem=8B  merges=5  <- LOST(+8)
+    step   10:      214    [27, 94] U {124} U {142} U {214}    mem=8B  merges=6  <- LOST(+10)
+    step   11:      107    [27, 107] U {124} U {142} U {214}    mem=8B  merges=7  <- LOST(+12)
+
+  Result: UNKNOWN  -- overflow at step 12: 107 -> 322 exceeds 8 bits
+  Tokens(merges): 7  |  Phantoms: 73  |  Peak memory: 8B
+
+  Budget: bits=16, intervals=1, steps=200
+    step    0:       27    {27}    mem=4B  merges=0  
+    step    1:       82    [27, 82]    mem=4B  merges=1  <- LOST(+54)
+    step    2:       41    [27, 82]    mem=4B  merges=1  
+    step    3:      124    [27, 124]    mem=4B  merges=2  <- LOST(+41)
+    step    4:       62    [27, 124]    mem=4B  merges=2  
+    step    5:       31    [27, 124]    mem=4B  merges=2  
+    step    6:       94    [27, 124]    mem=4B  merges=2  
+    ... 98 steps omitted ...
+    step  105:       10    [10, 9232]    mem=4B  merges=18  <- LOST(+9)
+    step  106:        5    [5, 9232]    mem=4B  merges=19  <- LOST(+4)
+    step  107:       16    [5, 9232]    mem=4B  merges=19  
+    step  108:        8    [5, 9232]    mem=4B  merges=19  
+    step  109:        4    [4, 9232]    mem=4B  merges=19  
+    step  110:        2    [2, 9232]    mem=4B  merges=20  <- LOST(+1)
+    step  111:        1    [1, 9232]    mem=4B  merges=20  
+
+  Result: CONCRETE -- exit at step 111, value = 1
+  Tokens(merges): 20  |  Phantoms: 9209  |  Peak memory: 4B
+
+  Budget: bits=16, intervals=8, steps=200
+    step    0:       27    {27}    mem=4B  merges=0  
+    step    1:       82    {27} U {82}    mem=8B  merges=0  
+    step    2:       41    {27} U {41} U {82}    mem=12B  merges=0  
+    step    3:      124    {27} U {41} U {82} U {124}    mem=16B  merges=0  
+    step    4:       62    {27} U {41} U {62} U {82} U {124}    mem=20B  merges=0  
+    step    5:       31    {27} U {31} U {41} U {62} U {82} U {124}    mem=24B  merges=0  
+    step    6:       94    {27} U {31} U {41} U {62} U {82} U {94} U {124}    mem=28B  merges=0  
+    ... 98 steps omitted ...
+    step  105:       10    [10, 2734] U [3077, 3238] U {3644} U {4102} U [4616, 4858] U {6154} U {7288} U {9232}    mem=32B  merges=57  <- LOST(+9)
+    step  106:        5    [5, 2734] U [3077, 3238] U {3644} U {4102} U [4616, 4858] U {6154} U {7288} U {9232}    mem=32B  merges=58  <- LOST(+4)
+    step  107:       16    [5, 2734] U [3077, 3238] U {3644} U {4102} U [4616, 4858] U {6154} U {7288} U {9232}    mem=32B  merges=58  
+    step  108:        8    [5, 2734] U [3077, 3238] U {3644} U {4102} U [4616, 4858] U {6154} U {7288} U {9232}    mem=32B  merges=58  
+    step  109:        4    [4, 2734] U [3077, 3238] U {3644} U {4102} U [4616, 4858] U {6154} U {7288} U {9232}    mem=32B  merges=58  
+    step  110:        2    [2, 2734] U [3077, 3238] U {3644} U {4102} U [4616, 4858] U {6154} U {7288} U {9232}    mem=32B  merges=59  <- LOST(+1)
+    step  111:        1    [1, 2734] U [3077, 3238] U {3644} U {4102} U [4616, 4858] U {6154} U {7288} U {9232}    mem=32B  merges=59  
+
+  Result: CONCRETE -- exit at step 111, value = 1
+  Tokens(merges): 59  |  Phantoms: 3075  |  Peak memory: 32B
+
+--- Infinite loop (b += 2) ---
+  for (;;) { b = b + 2; }
+
+  Budget: bits=32, intervals=1, steps=10
+    step    0:        0    {0}    mem=8B  merges=0  
+    step    1:        2    [0, 2]    mem=8B  merges=1  <- LOST(+1)
+    step    2:        4    [0, 4]    mem=8B  merges=2  <- LOST(+1)
+    step    3:        6    [0, 6]    mem=8B  merges=3  <- LOST(+1)
+    step    4:        8    [0, 8]    mem=8B  merges=4  <- LOST(+1)
+    step    5:       10    [0, 10]    mem=8B  merges=5  <- LOST(+1)
+    step    6:       12    [0, 12]    mem=8B  merges=6  <- LOST(+1)
+    step    7:       14    [0, 14]    mem=8B  merges=7  <- LOST(+1)
+    step    8:       16    [0, 16]    mem=8B  merges=8  <- LOST(+1)
+    step    9:       18    [0, 18]    mem=8B  merges=9  <- LOST(+1)
+    step   10:       20    [0, 20]    mem=8B  merges=10  <- LOST(+1)
+
+  Result: INFINITE -- {0, +, 2}, step budget (10) exhausted
+  Tokens(merges): 10  |  Phantoms: 10  |  Peak memory: 8B
+
+  Budget: bits=32, intervals=5, steps=10
+    step    0:        0    {0}    mem=8B  merges=0  
+    step    1:        2    {0} U {2}    mem=16B  merges=0  
+    step    2:        4    {0} U {2} U {4}    mem=24B  merges=0  
+    step    3:        6    {0} U {2} U {4} U {6}    mem=32B  merges=0  
+    step    4:        8    {0} U {2} U {4} U {6} U {8}    mem=40B  merges=0  
+    step    5:       10    [0, 2] U {4} U {6} U {8} U {10}    mem=40B  merges=1  <- LOST(+1)
+    step    6:       12    [0, 4] U {6} U {8} U {10} U {12}    mem=40B  merges=2  <- LOST(+1)
+    step    7:       14    [0, 6] U {8} U {10} U {12} U {14}    mem=40B  merges=3  <- LOST(+1)
+    step    8:       16    [0, 8] U {10} U {12} U {14} U {16}    mem=40B  merges=4  <- LOST(+1)
+    step    9:       18    [0, 10] U {12} U {14} U {16} U {18}    mem=40B  merges=5  <- LOST(+1)
+    step   10:       20    [0, 12] U {14} U {16} U {18} U {20}    mem=40B  merges=6  <- LOST(+1)
+
+  Result: INFINITE -- {0, +, 2}, step budget (10) exhausted
+  Tokens(merges): 6  |  Phantoms: 6  |  Peak memory: 40B
+
+  Budget: bits=32, intervals=1, steps=50
+    step    0:        0    {0}    mem=8B  merges=0  
+    step    1:        2    [0, 2]    mem=8B  merges=1  <- LOST(+1)
+    step    2:        4    [0, 4]    mem=8B  merges=2  <- LOST(+1)
+    step    3:        6    [0, 6]    mem=8B  merges=3  <- LOST(+1)
+    step    4:        8    [0, 8]    mem=8B  merges=4  <- LOST(+1)
+    step    5:       10    [0, 10]    mem=8B  merges=5  <- LOST(+1)
+    step    6:       12    [0, 12]    mem=8B  merges=6  <- LOST(+1)
+    ... 37 steps omitted ...
+    step   44:       88    [0, 88]    mem=8B  merges=44  <- LOST(+1)
+    step   45:       90    [0, 90]    mem=8B  merges=45  <- LOST(+1)
+    step   46:       92    [0, 92]    mem=8B  merges=46  <- LOST(+1)
+    step   47:       94    [0, 94]    mem=8B  merges=47  <- LOST(+1)
+    step   48:       96    [0, 96]    mem=8B  merges=48  <- LOST(+1)
+    step   49:       98    [0, 98]    mem=8B  merges=49  <- LOST(+1)
+    step   50:      100    [0, 100]    mem=8B  merges=50  <- LOST(+1)
+
+  Result: INFINITE -- {0, +, 2}, step budget (50) exhausted
+  Tokens(merges): 50  |  Phantoms: 50  |  Peak memory: 8B
+
+--- Concrete loop (c += 3, exit at 10) ---
+  for (i = 0; i < 10; ++i) { c = c + 3; }
+
+  Budget: bits=8, intervals=1, steps=100
+    step    0:        0    {0}    mem=2B  merges=0  
+    step    1:        3    [0, 3]    mem=2B  merges=1  <- LOST(+2)
+    step    2:        6    [0, 6]    mem=2B  merges=2  <- LOST(+2)
+    step    3:        9    [0, 9]    mem=2B  merges=3  <- LOST(+2)
+    step    4:       12    [0, 12]    mem=2B  merges=4  <- LOST(+2)
+    step    5:       15    [0, 15]    mem=2B  merges=5  <- LOST(+2)
+    step    6:       18    [0, 18]    mem=2B  merges=6  <- LOST(+2)
+    step    7:       21    [0, 21]    mem=2B  merges=7  <- LOST(+2)
+    step    8:       24    [0, 24]    mem=2B  merges=8  <- LOST(+2)
+    step    9:       27    [0, 27]    mem=2B  merges=9  <- LOST(+2)
+    step   10:       30    [0, 30]    mem=2B  merges=10  <- LOST(+2)
+
+  Result: CONCRETE -- exit at step 10, value = 30
+  Tokens(merges): 10  |  Phantoms: 20  |  Peak memory: 2B
+
+  Budget: bits=8, intervals=5, steps=100
+    step    0:        0    {0}    mem=2B  merges=0  
+    step    1:        3    {0} U {3}    mem=4B  merges=0  
+    step    2:        6    {0} U {3} U {6}    mem=6B  merges=0  
+    step    3:        9    {0} U {3} U {6} U {9}    mem=8B  merges=0  
+    step    4:       12    {0} U {3} U {6} U {9} U {12}    mem=10B  merges=0  
+    step    5:       15    [0, 3] U {6} U {9} U {12} U {15}    mem=10B  merges=1  <- LOST(+2)
+    step    6:       18    [0, 6] U {9} U {12} U {15} U {18}    mem=10B  merges=2  <- LOST(+2)
+    step    7:       21    [0, 9] U {12} U {15} U {18} U {21}    mem=10B  merges=3  <- LOST(+2)
+    step    8:       24    [0, 12] U {15} U {18} U {21} U {24}    mem=10B  merges=4  <- LOST(+2)
+    step    9:       27    [0, 15] U {18} U {21} U {24} U {27}    mem=10B  merges=5  <- LOST(+2)
+    step   10:       30    [0, 18] U {21} U {24} U {27} U {30}    mem=10B  merges=6  <- LOST(+2)
+
+  Result: CONCRETE -- exit at step 10, value = 30
+  Tokens(merges): 6  |  Phantoms: 12  |  Peak memory: 10B
+
+  Budget: bits=8, intervals=11, steps=100
+    step    0:        0    {0}    mem=2B  merges=0  
+    step    1:        3    {0} U {3}    mem=4B  merges=0  
+    step    2:        6    {0} U {3} U {6}    mem=6B  merges=0  
+    step    3:        9    {0} U {3} U {6} U {9}    mem=8B  merges=0  
+    step    4:       12    {0} U {3} U {6} U {9} U {12}    mem=10B  merges=0  
+    step    5:       15    {0} U {3} U {6} U {9} U {12} U {15}    mem=12B  merges=0  
+    step    6:       18    {0} U {3} U {6} U {9} U {12} U {15} U {18}    mem=14B  merges=0  
+    step    7:       21    {0} U {3} U {6} U {9} U {12} U {15} U {18} U {21}    mem=16B  merges=0  
+    step    8:       24    {0} U {3} U {6} U {9} U {12} U {15} U {18} U {21} U {24}    mem=18B  merges=0  
+    step    9:       27    {0} U {3} U {6} U {9} U {12} U {15} U {18} U {21} U {24} U {27}    mem=20B  merges=0  
+    step   10:       30    {0} U {3} U {6} U {9} U {12} U {15} U {18} U {21} U {24} U {27} U {30}    mem=22B  merges=0  
+
+  Result: CONCRETE -- exit at step 10, value = 30
+  Tokens(merges): 0  |  Phantoms: 0  |  Peak memory: 22B
+
+--- lim sin(x)/x — is it ≡ 1, = 1, or ≈ 1? ---
+  x → 0: sin(x)/x → 1. Fixed-point scale = precision budget.
+
+  Budget: bits=32, intervals=4, steps=0
+    step    0:        —    {}    mem=0B  merges=0  (frozen)
+
+  Result: FROZEN   -- L bound, not yet evaluated
+  Tokens(merges): 0  |  Phantoms: 0  |  Peak memory: 0B
+
+  Budget: bits=32, intervals=4, steps=1
+    step    0:        —    {}    mem=0B  merges=0  (frozen)
+    step    1:   841471    {841471}    mem=8B  merges=0  
+
+  Result: INFINITE -- converging: last = 841471, target = 1000000 (1.0)
+  Tokens(merges): 0  |  Phantoms: 0  |  Peak memory: 8B
+
+  Budget: bits=32, intervals=4, steps=3
+    step    0:        —    {}    mem=0B  merges=0  (frozen)
+    step    1:   841471    {841471}    mem=8B  merges=0  
+    step    2:   998334    {841471} U {998334}    mem=16B  merges=0  
+    step    3:   999983    {841471} U {998334} U {999983}    mem=24B  merges=0  
+
+  Result: INFINITE -- converging: last = 999983, target = 1000000 (1.0)
+  Tokens(merges): 0  |  Phantoms: 0  |  Peak memory: 24B
+
+  Budget: bits=32, intervals=4, steps=5
+    step    0:        —    {}    mem=0B  merges=0  (frozen)
+    step    1:   841471    {841471}    mem=8B  merges=0  
+    step    2:   998334    {841471} U {998334}    mem=16B  merges=0  
+    step    3:   999983    {841471} U {998334} U {999983}    mem=24B  merges=0  
+    step    4:  1000000    {841471} U {998334} U {999983} U {1000000}    mem=32B  merges=0  
+    step    5:  1000000    {841471} U {998334} U {999983} U {1000000}    mem=32B  merges=0  
+
+  Result: CONCRETE -- exit at step 5, value = 1000000
+  Tokens(merges): 0  |  Phantoms: 0  |  Peak memory: 32B
+
+--- lim sin(x)/x — higher precision (scale=10^9) ---
+  Same limit, more precision bits. More tokens needed to converge.
+
+  Budget: bits=32, intervals=4, steps=5
+    step    0:        —    {}    mem=0B  merges=0  (frozen)
+    step    1: 841470985    {841470985}    mem=8B  merges=0  
+    step    2: 998334166    {841470985} U {998334166}    mem=16B  merges=0  
+    step    3: 999983333    {841470985} U {998334166} U {999983333}    mem=24B  merges=0  
+    step    4: 999999833    {841470985} U {998334166} U {999983333} U {999999833}    mem=32B  merges=0  
+    step    5: 999999998    {841470985} U {998334166} U {999983333} U [999999833, 999999998]    mem=32B  merges=1  <- LOST(+164)
+
+  Result: INFINITE -- converging: last = 999999998, target = 1000000000 (1.0)
+  Tokens(merges): 1  |  Phantoms: 164  |  Peak memory: 32B
+
+  Budget: bits=32, intervals=4, steps=8
+    step    0:        —    {}    mem=0B  merges=0  (frozen)
+    step    1: 841470985    {841470985}    mem=8B  merges=0  
+    step    2: 998334166    {841470985} U {998334166}    mem=16B  merges=0  
+    step    3: 999983333    {841470985} U {998334166} U {999983333}    mem=24B  merges=0  
+    step    4: 999999833    {841470985} U {998334166} U {999983333} U {999999833}    mem=32B  merges=0  
+    step    5: 999999998    {841470985} U {998334166} U {999983333} U [999999833, 999999998]    mem=32B  merges=1  <- LOST(+164)
+    step    6: 1000000000    {841470985} U {998334166} U {999983333} U [999999833, 1000000000]    mem=32B  merges=2  <- LOST(+1)
+    step    7: 1000000000    {841470985} U {998334166} U {999983333} U [999999833, 1000000000]    mem=32B  merges=2  
+    step    8: 1000000000    {841470985} U {998334166} U {999983333} U [999999833, 1000000000]    mem=32B  merges=2  
+
+  Result: CONCRETE -- exit at step 8, value = 1000000000
+  Tokens(merges): 2  |  Phantoms: 165  |  Peak memory: 32B
+

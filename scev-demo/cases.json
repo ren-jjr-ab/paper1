@@ -1,0 +1,55 @@
+{
+  "cases": [
+    {
+      "name": "Collatz(27)",
+      "description": "for (;;) { if (a == 1) break; a = (a%2==0) ? a/2 : 3*a+1; }",
+      "program": { "type": "collatz", "start": 27 },
+      "budgets": [
+        { "max_bits": 8,  "max_intervals": 1, "max_steps": 200 },
+        { "max_bits": 8,  "max_intervals": 4, "max_steps": 200 },
+        { "max_bits": 16, "max_intervals": 1, "max_steps": 200 },
+        { "max_bits": 16, "max_intervals": 8, "max_steps": 200 }
+      ]
+    },
+    {
+      "name": "Infinite loop (b += 2)",
+      "description": "for (;;) { b = b + 2; }",
+      "program": { "type": "infinite", "init": 0, "stride": 2 },
+      "budgets": [
+        { "max_bits": 32, "max_intervals": 1,  "max_steps": 10 },
+        { "max_bits": 32, "max_intervals": 5,  "max_steps": 10 },
+        { "max_bits": 32, "max_intervals": 1,  "max_steps": 50 }
+      ]
+    },
+    {
+      "name": "Concrete loop (c += 3, exit at 10)",
+      "description": "for (i = 0; i < 10; ++i) { c = c + 3; }",
+      "program": { "type": "concrete", "init": 0, "stride": 3, "exit_at": 10 },
+      "budgets": [
+        { "max_bits": 8, "max_intervals": 1,  "max_steps": 100 },
+        { "max_bits": 8, "max_intervals": 5,  "max_steps": 100 },
+        { "max_bits": 8, "max_intervals": 11, "max_steps": 100 }
+      ]
+    },
+    {
+      "name": "lim sin(x)/x — is it ≡ 1, = 1, or ≈ 1?",
+      "description": "x → 0: sin(x)/x → 1. Fixed-point scale = precision budget.",
+      "program": { "type": "limit", "scale": 1000000 },
+      "budgets": [
+        { "max_bits": 32, "max_intervals": 4, "max_steps": 0 },
+        { "max_bits": 32, "max_intervals": 4, "max_steps": 1 },
+        { "max_bits": 32, "max_intervals": 4, "max_steps": 3 },
+        { "max_bits": 32, "max_intervals": 4, "max_steps": 5 }
+      ]
+    },
+    {
+      "name": "lim sin(x)/x — higher precision (scale=10^9)",
+      "description": "Same limit, more precision bits. More tokens needed to converge.",
+      "program": { "type": "limit", "scale": 1000000000 },
+      "budgets": [
+        { "max_bits": 32, "max_intervals": 4, "max_steps": 5 },
+        { "max_bits": 32, "max_intervals": 4, "max_steps": 8 }
+      ]
+    }
+  ]
+}
