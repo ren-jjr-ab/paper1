@@ -33,15 +33,17 @@
   An axiom system for existence. The symbol "$=$"
   resolves into three relations — native identity
   ($equiv$), interaction ($=$), and convention
-  ($approx$) — introduced through a three-layer
-  chain: *Existence* (entities and their
-  interactions), *Computable* (capacity and cost),
-  and *Iterable* (termination). Each layer commits
-  to a minimal primitive vocabulary and a minimal
-  set of axioms. The three relations, their
-  separations, and the impossibility results that
-  follow are derived within this structure.
-  Mechanically verified in Coq.
+  ($approx$) — introduced through three orthogonal
+  concerns: *Existence* (entities and their own
+  inherent time), *Computable* (cost structure for
+  real-world systems), and *ExternalTime* (an
+  externally imposed time coordinate, parallel to
+  Computable). Each commits to a minimal primitive
+  vocabulary and a minimal set of axioms. The three
+  relations, their separations, and the
+  impossibility results that follow are derived
+  within this structure. Mechanically verified in
+  Coq.
 ]
 
 #v(2em)
@@ -122,19 +124,23 @@ paper-projection relation defined there.
 
 = Primitives and axioms <sec-axioms>
 
-The framework is a small tree of layers. Existence
-is the root, carrying three primitives and five
-axioms. Each extension layer adds primitives and
-axioms to some earlier layer, inheriting its
-theorems. The layers used in this paper:
+The framework separates its axioms along three
+orthogonal concerns:
 
-- *Existence* — the root.
-- *Computable* — extends Existence with capacity
-  and cost.
-- *ExternalTime* — extends Existence with an
-  explicit event counter.
-- *Iterable* — extends Computable with a termination
-  witness.
+- *Existence* — existence itself and the entity's
+  own, inherent temporal axis. Every entity carries
+  its own time in the form of viewpoints that move
+  it; no external clock is assumed.
+- *Computable* — cost structure for real-world
+  systems. Interactions consume resources (capacity,
+  storage, work); no step is free.
+- *ExternalTime* — an externally imposed time
+  coordinate, distinct from the entity's own
+  temporal axis. Parallel to Computable, not
+  downstream of it.
+
+Each extension inherits Existence's primitives and
+theorems without modifying them.
 
 == Existence <sec-existence>
 
@@ -207,10 +213,11 @@ the framework something to distinguish (at least two
 entities); `interact_with` gives it something to observe
 (every entity is mapped to a different result by some
 viewpoint). Together they supply the static and
-dynamic minima. `interact_with` replaces any dedicated
-"time" axis — time is whatever viewpoint an instance
-identifies as the one whose interactions advance the
-state.
+dynamic minima. `interact_with` carries the entity's
+*own* temporal axis: time is not an external coordinate
+here but a viewpoint inherent to the entity — some
+partner always moves it. No external clock is assumed
+or needed at the Existence layer.
 
 *Decidability.* `interact_decidable` makes the kernel of
 interaction observable: at any common viewpoint, two
@@ -240,18 +247,19 @@ framework.
 
 == Computable
 
-Three primitives, two axioms.#footnote[Formalised
-in `framework/Computable.v` (module type
+Real-world systems pay for their interactions.
+Computable is the cost layer — three primitives,
+two axioms.#footnote[Formalised in
+`framework/Computable.v` (module type
 `ComputableExistenceSig`, theory functor
-`ComputableExistenceTheory`).] Extends Existence
-with a capacity and the two costs any interaction
-pays.
-`info_size` is the capacity of an entity at a moment —
-the number of distinguishable states it carries.
-Accumulated over an interaction chain, cost splits
-into `storage_cost` (the per-step charge on the
-source's `info_size`) and `flip_cost` (one token per
-step, plus any growth in `info_size`).
+`ComputableExistenceTheory`).] `info_size` is the
+capacity of an entity at a moment — the number of
+distinguishable states it carries. Accumulated over
+an interaction chain, cost splits into
+`storage_cost` (the per-step charge on the source's
+`info_size`) and `flip_cost` (one token per step,
+plus any growth in `info_size`). No interaction is
+free at this layer.
 
 *Primitives.*
 
@@ -321,13 +329,17 @@ physical unit. Those are instance commitments.
 
 == ExternalTime
 
-One primitive, one axiom.#footnote[Formalised in
-`framework/ExternalTime.v` (module type
-`ExternalTimeSig`, theory functor
-`ExternalTimeTheory`).] Extends Existence directly
-(parallel to Computable) with an explicit event
-counter — a coordinate that strictly advances
-on every non-identity interaction.
+ExternalTime introduces a time coordinate that is
+*not* the entity's own — an externally imposed
+counter, parallel to Computable (neither downstream
+of nor upstream from it), distinct from the internal
+temporal axis Existence already carries via
+`interact_with`. One primitive, one axiom.#footnote[
+Formalised in `framework/ExternalTime.v` (module
+type `ExternalTimeSig`, theory functor
+`ExternalTimeTheory`).] An observer's coordinate
+that strictly advances on every non-identity
+interaction.
 
 *Primitives.*
 
@@ -376,71 +388,6 @@ What the axioms leave free: the initial value of
 `external_time`, how fast it advances, and any
 alignment with a physical notion of time. Those
 are instance commitments.
-
-== Iterable
-
-One primitive, two axioms.#footnote[Formalised in
-`framework/Iterable.v` (module type
-`IterableComputableSig`).] Extends Computable with
-a termination witness: whether an interaction chain
-is declared to halt, and if so, how many steps
-remain.
-
-*Primitives.*
-
-#table(
-  columns: (auto, 1fr),
-  inset: 6pt,
-  align: (left + top, left + top),
-  [*Name*], [*Type*],
-  [`remaining`],
-    [`Entity -> option nat`],
-)
-
-*Axioms.*
-
-#table(
-  columns: (auto, 1fr),
-  inset: 6pt,
-  align: (left + top, left + top),
-  [*Name*], [*Statement*],
-
-  table.cell(colspan: 2)[_Remaining decrement_],
-  [`project_decrements_remaining`],
-    [`forall a c n,
-      interact a c <> a ->
-      remaining a = Some n ->
-      remaining (interact a c) = Some (n - 1)`],
-
-  table.cell(colspan: 2)[_Exit clause_],
-  [`done_stays_done`],
-    [`forall a c,
-      remaining a = Some 0 ->
-      remaining (interact a c) = Some 0`],
-)
-
-Two notes.
-
-*remaining.* `Some n` — the instance commits to
-$n$ iterator steps remaining from this entity.
-`None` — the instance declines to commit (looping
-or non-terminating). The commitment is a
-declaration, not a derivation: the framework does
-not audit the honesty, but once a commitment is
-made the two axioms force the consequences.
-
-*Exit clause.* `done_stays_done` is the one way out
-of `interact_with`. At `remaining = Some 0` (iterator
-exhausted), interaction is allowed to relabel but must
-keep the count at zero. This is the unique
-framework-sanctioned stable state — everywhere else,
-`interact_with` demands that some viewpoint produces a
-different result.
-
-What the axioms leave free: whether an instance
-commits at all (`Some` or `None`), what value it
-commits to, and how `remaining` relates to
-`info_size`. Those are instance commitments.
 
 // ============================================
 //  3. Three relations
@@ -578,9 +525,10 @@ in `framework/Existence.v`.]
 Direct from `interact_with`. The axiom rules out a
 terminal state where all viewpoints preserve the
 entity. In particular: no "perfectly stable" entity
-can exist in any instance — stability requires at
-least one additional commitment, such as the
-`remaining = Some 0` clause at the Iterable layer.
+can exist under Existence alone. Any notion of
+stability or termination is an instance-level
+commitment beyond the base axioms, not a framework
+primitive.
 
 *Fixed point at self-viewpoint.* Dually, every
 viewpoint fixes at least one entity — itself.#footnote[
