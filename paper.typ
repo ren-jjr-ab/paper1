@@ -1076,3 +1076,37 @@ cross-system morphism in machine-checked form.
 The framework says, in one line: _mathematics has
 been working with three equalities and spelling
 them the same way_.
+
+// ============================================
+//  References
+// ============================================
+
+= References
+
+The paper does not invoke specific prior results,
+but the framework and its mechanical verification
+draw on the following bodies of work:
+
+- The Coq Development Team. _The Coq Proof
+  Assistant Reference Manual_. INRIA, continually
+  updated. https://coq.inria.fr. The mechanical
+  verification lives in Coq; the Rocq fork shares
+  the same logical core and is interoperable.
+
+- H. B. Curry and R. Feys. _Combinatory Logic_,
+  Volume 1. North-Holland, 1958. The Curry–Howard
+  correspondence — the reading of proofs as
+  programs — is the substrate on which mechanical
+  verification is meaningful: a Coq term of type
+  $P$ is, under this correspondence, a proof of
+  $P$. The paper's "$=$ / $approx$" separation
+  is intelligible in a setting where "a witness is
+  a program" is the default stance.
+
+- C. E. Shannon. "A Mathematical Theory of
+  Communication". _Bell System Technical Journal_
+  27 (1948). The Computable layer's cost axioms
+  are motivated by information-theoretic ideas —
+  distinguishability has capacity, operations
+  have minimum work — although the paper does not
+  formalize a specific Shannon-style result.
