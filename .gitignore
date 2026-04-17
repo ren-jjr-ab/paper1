@@ -22,7 +22,6 @@ paper.pdf
 # Local README (not for public repo)
 README.md
 
-# Audit artifacts
-results/AssumptionsAudit.v
+# Audit compiled artifacts (source is kept; compiled output isn't)
 results/AssumptionsAudit.vo
 results/AssumptionsAudit.glob
