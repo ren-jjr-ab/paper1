@@ -13,8 +13,7 @@ Makefile
 Makefile.conf
 .Makefile.d
 
-# Typst build output
-paper.pdf
+# (paper.pdf is committed so GitHub can preview it inline)
 
 # Rocq native compilation
 .coq-native/
