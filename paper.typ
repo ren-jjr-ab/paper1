@@ -208,16 +208,19 @@ observed through itself is itself. This is the
 framework's only commitment about the self-viewpoint;
 every other pair of entities is treated symmetrically.
 
-*Existence and interact_with.* `existence` gives
-the framework something to distinguish (at least two
-entities); `interact_with` gives it something to observe
-(every entity is mapped to a different result by some
-viewpoint). Together they supply the static and
-dynamic minima. `interact_with` carries the entity's
-*own* temporal axis: time is not an external coordinate
-here but a viewpoint inherent to the entity — some
-partner always moves it. No external clock is assumed
-or needed at the Existence layer.
+*Existence and interact_with.* `existence` and
+`interact_with` together supply what interaction
+itself requires: at least two distinct entities to
+relate, and at least one viewpoint in which
+something moves. Neither axiom alone suffices —
+with only `existence`, nothing happens; with only
+`interact_with`, there is nothing distinct to
+observe. Together they are the irreducible minimum
+for interaction to be meaningful at all.
+`interact_with` carries the entity's *own*
+temporal axis: time as a viewpoint inherent to the
+entity, not an external coordinate. No external
+clock is assumed or needed at the Existence layer.
 
 *Decidability.* `interact_decidable` makes the kernel of
 interaction observable: at any common viewpoint, two
