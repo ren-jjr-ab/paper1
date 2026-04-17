@@ -1105,21 +1105,11 @@ draw on the following bodies of work:
 
 - C. E. Shannon. "A Mathematical Theory of
   Communication". _Bell System Technical Journal_
-  27 (1948). The Computable layer's cost axioms
-  are motivated by information-theoretic ideas —
-  distinguishability has capacity, operations
-  have minimum work — although the paper does not
-  formalize a specific Shannon-style result.
+  27 (1948). Referenced for information-theoretic
+  framing of distinguishability and capacity.
 
 - A. N. Kolmogorov. "Three approaches to the
   quantitative definition of information".
   _Problems of Information Transmission_ 1(1),
-  1965. Kolmogorov's complexity formalises the
-  same intuition the Computable layer makes
-  axiomatic: distinguishing an object from
-  another costs at least a minimum number of
-  units. The paper's quantization argument ($m^k$
-  cost accumulation under refinement) is in
-  the same spirit but is developed from the
-  framework's own axioms rather than from the
-  algorithmic setting.
+  1965. Referenced for the minimum-cost intuition
+  underlying the quantization argument.
