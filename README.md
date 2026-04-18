@@ -4,7 +4,7 @@ An axiom system that separates the single symbol `=` into three relations:
 `≡` (native identity), `=` (interaction), `≈` (convention). Mechanically
 verified in Coq, with zero `Admitted`.
 
-- **Paper:** [`paper.typ`](./paper.typ) / `paper.pdf` — core theory, ~30 pages.
+- **Paper:** [`paper.typ`](./paper.typ) / `paper.pdf` — core theory, ~12 pages.
 - **Mechanization:** 81 `.v` files across four layers, ~21,850 lines of Coq.
 - **Demo:** [`scev-demo/`](./scev-demo/) — Rust companion for the
   `lim sin(x)/x` budget experiment (paper §4.1.1).
