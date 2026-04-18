@@ -717,7 +717,7 @@ Writing $equiv_QQ$ for Q-value equivalence (the
 setoid equality, e.g., $1 \/ 2 equiv_QQ 2 \/ 4$),
 the central instance-level theorem states:#footnote[
 `rational_equivalent_paper_projection` in
-`distinction/RationalRep.v`.]
+`existences/RationalRep.v`.]
 
 #align(center)[
   $(q_1 != q_2) quad and quad (q_1 equiv_QQ q_2) quad arrow.double quad
@@ -771,7 +771,7 @@ limit condition; the second ensures the $approx$
 predicate is meaningful (non-reflexive); the third
 is what `convention_not_derivable` requires.#footnote[
 `cauchy_pointwise_distinct_convention` in
-`distinction/CauchyReal.v`.]
+`existences/CauchyReal.v`.]
 
 A central instance witness: the constant-$1$
 sequence and the sequence $1 + 1 \/ (n + 1)$ are
@@ -830,8 +830,8 @@ pointwise-distinct at every $n$.#footnote[
 
 `LatticeComputable` (and related
 `SemilatticeInstances`)#footnote[
-`distinction/LatticeModel.v`,
-`distinction/SemilatticeInstances.v`,
+`existences/LatticeModel.v`,
+`existences/SemilatticeInstances.v`,
 `framework/LatticeExternalTimed.v`.]
 realise an instance at the other end: only $equiv$
 is non-trivially inhabited.

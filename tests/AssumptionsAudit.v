@@ -91,3 +91,31 @@ Print Assumptions RationalToCauchyMorphism.phi_cannot_witness_convention.
    NOTE: This theorem uses pushout, which invokes quotient_exists. *)
 
 Print Assumptions RationalCauchyFactorization.phi_factors_via_pullback_pushout.
+
+
+(* ============================================================ *)
+(*  NEW INSTANCE RESULTS (2026-04)                              *)
+(* ============================================================ *)
+
+Require DedekindCauchyIsomorphism.
+Require IntegerGrothendieckFactorization.
+Require ModularCoequalizer.
+
+(* DedekindReal ≅ CauchyReal — framework isomorphism of the two
+   classical ℝ constructions, axiom-free. *)
+
+Print Assumptions DedekindCauchyIsomorphism.phi_is_iso.
+Print Assumptions DedekindCauchyIsomorphism.psi_is_iso.
+Print Assumptions DedekindCauchyIsomorphism.phi_preserves_convention.
+
+(* ℤ = ℕ²/~ via Grothendieck. NatPair / ker is iso to Integer via
+   phi_hat. *)
+
+Print Assumptions IntegerGrothendieckFactorization.phi_hat_is_iso.
+Print Assumptions IntegerGrothendieckFactorization.grothendieck_factorization.
+
+(* ℤ/7ℤ as Coequalizer. Residue classes distinct via r_star. *)
+
+Print Assumptions ModularCoequalizer.cls_0_eq_cls_7.
+Print Assumptions ModularCoequalizer.cls_0_ne_cls_1.
+Print Assumptions ModularCoequalizer.seven_reps_distinct.

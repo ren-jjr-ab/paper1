@@ -1,11 +1,12 @@
 -Q framework ""
--Q distinction ""
+-Q existences ""
 -Q results ""
+-Q tests ""
 
 -arg -native-compiler -arg no
 
 # ============================================================
-# Layer 0 — framework: Existence + Computable + Iterable
+# Layer 0 — framework: primitives, functors, morphisms
 # ============================================================
 
 framework/Existence.v
@@ -17,50 +18,83 @@ framework/ExistenceMorphism.v
 framework/ExistenceProduct.v
 framework/ExistencePullback.v
 framework/ExistencePushout.v
+framework/ExistenceEqualizer.v
+framework/ExistenceCoequalizer.v
+framework/ExistenceFactorization.v
 
 # ============================================================
-# Layer 1 — instances
+# Layer 1 — existences (each inhabits some ExistenceSig-family)
 # ============================================================
 
-distinction/YouAndMe.v
-distinction/ConsistencyModelPD.v
-distinction/LatticeModel.v
-distinction/HashModel.v
-distinction/CounterMachine.v
-distinction/PolyModel.v
-distinction/RealIterator.v
-distinction/SKIModel.v
-distinction/EpsilonDelta.v
-distinction/SemilatticeInstances.v
-distinction/RationalRep.v
-distinction/CauchyReal.v
+existences/YouAndMe.v
+existences/ConsistencyModelPD.v
+existences/LatticeModel.v
+existences/HashModel.v
+existences/CounterMachine.v
+existences/PolyModel.v
+existences/RealIterator.v
+existences/SKIModel.v
+existences/EpsilonDelta.v
+existences/SemilatticeInstances.v
+existences/IntegerGrothendieck.v
+existences/DedekindReal.v
+existences/RationalRep.v
+existences/CauchyReal.v
 
 # ============================================================
-# Layer 2 — results (functors + per-instance tests)
+# Layer 2 — results (mathematical content + main theorems)
 # ============================================================
 
+## Main framework theorems
 results/Trichotomy.v
 results/FrameworkRice.v
 results/FrameworkRiceCost.v
 results/FrameworkIrreversibility.v
+results/FrameworkHalting.v
+results/ExistenceHalting.v
+results/SATLowerBound.v
+results/ScaleInvariantCost.v
 
-results/TrichotomyTest.v
-results/FrameworkRiceTest.v
-results/FrameworkRiceCostTest.v
-results/MorphismTest.v
-results/PullbackTest.v
-results/PullbackLatHashTest.v
-results/PushoutTest.v
-results/RationalRepTest.v
-results/CauchyRealTest.v
+## Cross-instance math: RationalRep → CauchyReal chain
 results/RationalToCauchyMorphism.v
 results/RationalCauchyProduct.v
 results/RationalCauchyPullback.v
 results/RationalCauchyPushout.v
 results/RationalCauchyFactorization.v
+
+## Cross-instance math: Grothendieck, Modular, Dedekind
+results/IntegerGrothendieckFactorization.v
+results/ModularCoequalizer.v
+results/DedekindCauchyIsomorphism.v
+
+## Analysis witnesses
 results/CauchyLimits.v
 
-results/SATLowerBound.v
-results/ScaleInvariantCost.v
-results/FrameworkHalting.v
-results/ExistenceHalting.v
+# ============================================================
+# Layer 3 — tests (framework functor verification, instance suites, audit)
+# ============================================================
+
+## Framework functor pedagogical tests (on Lattice)
+tests/MorphismTest.v
+tests/PullbackTest.v
+tests/PushoutTest.v
+tests/EqualizerTest.v
+tests/CoequalizerTest.v
+tests/FactorizationTest.v
+tests/PullbackLatHashTest.v
+
+## Instance functor suites (Eq/Coeq/Fact applied to one instance)
+tests/HashFunctorTests.v
+tests/CauchyFunctorTests.v
+
+## Instance-specific witness tests (paper_projection / convention)
+tests/RationalRepTest.v
+tests/CauchyRealTest.v
+
+## Main theorem tests
+tests/TrichotomyTest.v
+tests/FrameworkRiceTest.v
+tests/FrameworkRiceCostTest.v
+
+## Assumptions audit (standalone; NOT compiled by main build)
+# tests/AssumptionsAudit.v — run via: coqc -Q framework "" -Q existences "" -Q results "" -Q tests "" tests/AssumptionsAudit.v

@@ -56,6 +56,40 @@ Module Identity (D : ExistenceSig).
     forall a b, id (interact a b) = interact (id a) (id b).
   Proof. intros. unfold id. reflexivity. Qed.
 
+  (* Identity preserves convention trivially. *)
+
+  Theorem id_preserves_convention :
+    forall a b, convention_eq a b -> convention_eq (id a) (id b).
+  Proof. intros a b H. unfold id. exact H. Qed.
+
+  (* Identity is faithful (image agreement = source
+     agreement, by definition). *)
+
+  Theorem id_faithful :
+    forall a b c : Entity,
+      interact (id a) (id c) <> interact (id b) (id c) ->
+      interact a c <> interact b c.
+  Proof. intros a b c. unfold id. intros H; exact H. Qed.
+
+  (* Identity is observational. *)
+
+  Theorem id_observational :
+    forall a b c : Entity,
+      interact (id (interact a b)) c =
+      interact (interact (id a) (id b)) c.
+  Proof. intros. unfold id. reflexivity. Qed.
+
+  (* Identity is its own inverse — it is an isomorphism. *)
+
+  Theorem id_is_iso :
+    exists psi : Entity -> Entity,
+      (forall a b, id (interact a b) = interact (id a) (id b)) /\
+      (forall a, psi (id a) = a) /\
+      (forall b, id (psi b) = b).
+  Proof.
+    exists id. repeat split; intros; unfold id; reflexivity.
+  Qed.
+
 End Identity.
 
 
@@ -200,6 +234,113 @@ Module Make (D1 D2 : ExistenceSig).
     apply (injective_morphism_reflects_convention
              phi Hphi Hinj a a Hconv a).
     reflexivity.
+  Qed.
+
+  (* ============================================= *)
+  (*  CONVENTION PRESERVATION                      *)
+  (*                                               *)
+  (*  Dual of convention reflection. Forward       *)
+  (*  direction — source convention_eq carries to  *)
+  (*  target. Unlike reflection (target → source,  *)
+  (*  derivable from injective + preserves_interact*)
+  (*  via morphism_carries_agreement), preservation*)
+  (*  is NOT automatic: target may contain         *)
+  (*  viewpoints outside phi's image at which      *)
+  (*  phi(a) and phi(b) agree, even when source    *)
+  (*  convention forbids agreement at every        *)
+  (*  source-derived viewpoint. Exposed as a       *)
+  (*  separate property; instances assert it       *)
+  (*  explicitly when it holds.                    *)
+  (*                                               *)
+  (*  Note on framework scope: a bare              *)
+  (*  preserves_convention proof cannot be         *)
+  (*  discharged at signature level — convention_eq*)
+  (*  is an opaque Parameter with no constructor.  *)
+  (*  Each instance's convention_eq has its own    *)
+  (*  witness form, and the instance's morphism    *)
+  (*  author proves preservation against that form.*)
+  (* ============================================= *)
+
+  Definition preserves_convention
+    (phi : D1.Entity -> D2.Entity) : Prop :=
+    forall a b : D1.Entity,
+      D1.convention_eq a b -> D2.convention_eq (phi a) (phi b).
+
+  Definition full_morphism
+    (phi : D1.Entity -> D2.Entity) : Prop :=
+    preserves_interact phi /\ preserves_convention phi.
+
+  (* Source convention pair survives as target distinct
+     pair under preservation. *)
+
+  Theorem preserves_convention_distinct :
+    forall phi a b,
+      preserves_convention phi ->
+      D1.convention_eq a b ->
+      phi a <> phi b.
+  Proof.
+    intros phi a b Hpres Hconv Heq.
+    apply (D2.convention_not_derivable
+             (phi a) (phi b) (Hpres a b Hconv) (phi a)).
+    rewrite <- Heq. reflexivity.
+  Qed.
+
+  (* Convention-pair's disagreement lifts to the image
+     of every source viewpoint, without needing
+     preserves_convention — only preserves_interact and
+     injectivity. This is the "image-level" half of
+     what full preservation would give. *)
+
+  Theorem injective_preserves_convention_in_image :
+    forall phi,
+      preserves_interact phi -> injective phi ->
+      forall a b c : D1.Entity,
+        D1.convention_eq a b ->
+        D2.interact (phi a) (phi c) <> D2.interact (phi b) (phi c).
+  Proof.
+    intros phi Hphi Hinj a b c Hconv Heq.
+    rewrite <- (Hphi a c) in Heq.
+    rewrite <- (Hphi b c) in Heq.
+    apply Hinj in Heq.
+    exact (D1.convention_not_derivable a b Hconv c Heq).
+  Qed.
+
+  (* Projections from full_morphism. *)
+
+  Theorem full_morphism_preserves_interact :
+    forall phi, full_morphism phi -> preserves_interact phi.
+  Proof. intros phi [H _]. exact H. Qed.
+
+  Theorem full_morphism_preserves_convention :
+    forall phi, full_morphism phi -> preserves_convention phi.
+  Proof. intros phi [_ H]. exact H. Qed.
+
+  (* ============================================= *)
+  (*  FAITHFULNESS                                 *)
+  (*                                               *)
+  (*  A morphism is faithful when target           *)
+  (*  disagreement reflects back to source         *)
+  (*  disagreement. Equivalently, morphism         *)
+  (*  agreement is "if and only if" at the         *)
+  (*  image of any viewpoint.                      *)
+  (*                                               *)
+  (*  Under strict preservation, faithfulness is   *)
+  (*  automatic via the contrapositive of          *)
+  (*  morphism_carries_agreement. Exposed as a     *)
+  (*  separate name for clarity of use.            *)
+  (* ============================================= *)
+
+  Definition faithful (phi : D1.Entity -> D2.Entity) : Prop :=
+    forall a b c : D1.Entity,
+      D2.interact (phi a) (phi c) <> D2.interact (phi b) (phi c) ->
+      D1.interact a c <> D1.interact b c.
+
+  Theorem preserves_interact_is_faithful :
+    forall phi, preserves_interact phi -> faithful phi.
+  Proof.
+    intros phi Hphi a b c Hne Heq.
+    apply Hne.
+    apply (morphism_carries_agreement phi Hphi a b c Heq).
   Qed.
 
   (* ============================================= *)
@@ -427,6 +568,93 @@ Module Make (D1 D2 : ExistenceSig).
     exact (Hobs a b c).
   Qed.
 
+  (* ============================================= *)
+  (*  ISOMORPHISM                                  *)
+  (*                                               *)
+  (*  phi is an isomorphism when it has a two-     *)
+  (*  sided inverse psi. The inverse's interact    *)
+  (*  preservation is automatic (derived below);   *)
+  (*  convention preservation of the inverse is    *)
+  (*  NOT automatic, since convention_eq is opaque *)
+  (*  at signature level. A full iso bundles       *)
+  (*  convention preservation in both directions.  *)
+  (* ============================================= *)
+
+  Definition is_iso (phi : D1.Entity -> D2.Entity) : Prop :=
+    exists psi : D2.Entity -> D1.Entity,
+      preserves_interact phi /\
+      (forall a : D1.Entity, psi (phi a) = a) /\
+      (forall b : D2.Entity, phi (psi b) = b).
+
+  (* The inverse of an iso is itself interact-preserving.
+     No additional hypothesis needed — follows from phi's
+     preservation and the two inverse laws. *)
+
+  Theorem iso_inverse_preserves_interact :
+    forall (phi : D1.Entity -> D2.Entity)
+           (psi : D2.Entity -> D1.Entity),
+      preserves_interact phi ->
+      (forall a : D1.Entity, psi (phi a) = a) ->
+      (forall b : D2.Entity, phi (psi b) = b) ->
+      forall b1 b2 : D2.Entity,
+        psi (D2.interact b1 b2) = D1.interact (psi b1) (psi b2).
+  Proof.
+    intros phi psi Hphi Hleft Hright b1 b2.
+    pose proof (Hphi (psi b1) (psi b2)) as H.
+    rewrite (Hright b1) in H.
+    rewrite (Hright b2) in H.
+    rewrite <- H.
+    apply Hleft.
+  Qed.
+
+  Theorem iso_injective :
+    forall phi, is_iso phi -> injective phi.
+  Proof.
+    intros phi [psi [_ [Hleft _]]].
+    intros a b Heq.
+    rewrite <- (Hleft a).
+    rewrite <- (Hleft b).
+    rewrite Heq.
+    reflexivity.
+  Qed.
+
+  Theorem iso_surjective :
+    forall phi,
+      is_iso phi ->
+      forall b : D2.Entity, exists a : D1.Entity, phi a = b.
+  Proof.
+    intros phi [psi [_ [_ Hright]]] b.
+    exists (psi b). apply Hright.
+  Qed.
+
+  (* ============================================= *)
+  (*  FULL ISOMORPHISM                             *)
+  (*                                               *)
+  (*  Iso bundled with convention preservation in  *)
+  (*  both directions. Convention preservation is  *)
+  (*  not derivable from interact-preserving       *)
+  (*  inverse (convention_eq is opaque), so it is  *)
+  (*  explicit in the bundle.                      *)
+  (* ============================================= *)
+
+  Definition is_full_iso (phi : D1.Entity -> D2.Entity) : Prop :=
+    exists psi : D2.Entity -> D1.Entity,
+      preserves_interact phi /\
+      preserves_convention phi /\
+      (forall a : D1.Entity, psi (phi a) = a) /\
+      (forall b : D2.Entity, phi (psi b) = b) /\
+      (forall b1 b2 : D2.Entity,
+         D2.convention_eq b1 b2 ->
+         D1.convention_eq (psi b1) (psi b2)).
+
+  Theorem full_iso_is_iso :
+    forall phi, is_full_iso phi -> is_iso phi.
+  Proof.
+    intros phi [psi [Hphi [_ [Hleft [Hright _]]]]].
+    exists psi.
+    exact (conj Hphi (conj Hleft Hright)).
+  Qed.
+
 End Make.
 
 
@@ -470,6 +698,112 @@ Module Compose (D1 D2 D3 : ExistenceSig).
     intros psi phi Hphi_inj Hpsi_inj a b Heq.
     unfold compose in Heq.
     apply Hphi_inj. apply Hpsi_inj. exact Heq.
+  Qed.
+
+  (* Convention preservation composes. *)
+
+  Theorem compose_preserves_convention :
+    forall (psi : D2.Entity -> D3.Entity)
+           (phi : D1.Entity -> D2.Entity),
+      (forall a b, D1.convention_eq a b ->
+                   D2.convention_eq (phi a) (phi b)) ->
+      (forall a b, D2.convention_eq a b ->
+                   D3.convention_eq (psi a) (psi b)) ->
+      forall a b,
+        D1.convention_eq a b ->
+        D3.convention_eq (compose psi phi a) (compose psi phi b).
+  Proof.
+    intros psi phi Hphi Hpsi a b Hconv.
+    unfold compose.
+    apply Hpsi. apply Hphi. exact Hconv.
+  Qed.
+
+  (* Faithfulness composes: target disagreement reflects
+     back through both layers. *)
+
+  Theorem compose_preserves_faithful :
+    forall (psi : D2.Entity -> D3.Entity)
+           (phi : D1.Entity -> D2.Entity),
+      (forall a b c : D1.Entity,
+         D2.interact (phi a) (phi c) <> D2.interact (phi b) (phi c) ->
+         D1.interact a c <> D1.interact b c) ->
+      (forall a b c : D2.Entity,
+         D3.interact (psi a) (psi c) <> D3.interact (psi b) (psi c) ->
+         D2.interact a c <> D2.interact b c) ->
+      forall a b c : D1.Entity,
+        D3.interact (compose psi phi a) (compose psi phi c) <>
+        D3.interact (compose psi phi b) (compose psi phi c) ->
+        D1.interact a c <> D1.interact b c.
+  Proof.
+    intros psi phi Hphi Hpsi a b c Hne.
+    apply Hphi. apply (Hpsi (phi a) (phi b) (phi c)). exact Hne.
+  Qed.
+
+  (* Observational preservation composes when the inner
+     morphism is strict. Pure observational × observational
+     does not compose straightforwardly; the strict inner
+     layer eliminates the gap. *)
+
+  Theorem compose_strict_then_observational :
+    forall (psi : D2.Entity -> D3.Entity)
+           (phi : D1.Entity -> D2.Entity),
+      (forall a b,
+        phi (D1.interact a b) = D2.interact (phi a) (phi b)) ->
+      (forall a b c,
+         D3.interact (psi (D2.interact a b)) c =
+         D3.interact (D3.interact (psi a) (psi b)) c) ->
+      forall a b c,
+        D3.interact (compose psi phi (D1.interact a b)) c =
+        D3.interact
+          (D3.interact (compose psi phi a) (compose psi phi b)) c.
+  Proof.
+    intros psi phi Hphi Hpsi a b c.
+    unfold compose. rewrite Hphi. apply Hpsi.
+  Qed.
+
+  (* Reverse-order composition — the type of an iso's
+     inverse. psi : D2→D3, phi : D1→D2 compose to
+     D1→D3; their inverses psi_inv : D3→D2, phi_inv :
+     D2→D1 compose to D3→D1 in reverse order. *)
+
+  Definition compose_inv
+    (psi_inv : D3.Entity -> D2.Entity)
+    (phi_inv : D2.Entity -> D1.Entity) : D3.Entity -> D1.Entity :=
+    fun x => phi_inv (psi_inv x).
+
+  (* Composition of isomorphisms is an isomorphism.
+     The inverse of the composite is the composite of
+     the inverses (in reverse order). *)
+
+  Theorem compose_of_iso_is_iso :
+    forall (psi : D2.Entity -> D3.Entity)
+           (phi : D1.Entity -> D2.Entity)
+           (psi_inv : D3.Entity -> D2.Entity)
+           (phi_inv : D2.Entity -> D1.Entity),
+      (* psi iso with inverse psi_inv *)
+      (forall a b, psi (D2.interact a b) =
+                   D3.interact (psi a) (psi b)) ->
+      (forall a, psi_inv (psi a) = a) ->
+      (forall b, psi (psi_inv b) = b) ->
+      (* phi iso with inverse phi_inv *)
+      (forall a b, phi (D1.interact a b) =
+                   D2.interact (phi a) (phi b)) ->
+      (forall a, phi_inv (phi a) = a) ->
+      (forall b, phi (phi_inv b) = b) ->
+      (* compose psi phi is iso with compose_inv psi_inv phi_inv *)
+      (forall a b, compose psi phi (D1.interact a b) =
+                   D3.interact (compose psi phi a)
+                               (compose psi phi b)) /\
+      (forall a, compose_inv psi_inv phi_inv (compose psi phi a) = a) /\
+      (forall b, compose psi phi (compose_inv psi_inv phi_inv b) = b).
+  Proof.
+    intros psi phi psi_inv phi_inv Hpsi Hpsi_l Hpsi_r Hphi Hphi_l Hphi_r.
+    split; [|split].
+    - apply compose_preserves_interact; assumption.
+    - intros a. unfold compose, compose_inv.
+      rewrite Hpsi_l. apply Hphi_l.
+    - intros b. unfold compose, compose_inv.
+      rewrite Hphi_r. apply Hpsi_r.
   Qed.
 
 End Compose.

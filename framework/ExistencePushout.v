@@ -212,6 +212,24 @@ Module Construction
 
   (* ============================================= *)
   (*  CONVENTION_EQ                                *)
+  (*                                               *)
+  (*  Defined as False — the Construction          *)
+  (*  introduces no convention beyond what the     *)
+  (*  span contributes via interaction. This is    *)
+  (*  a design choice.                             *)
+  (*                                               *)
+  (*  Consequences:                                *)
+  (*                                               *)
+  (*  - convention_not_derivable holds vacuously.  *)
+  (*  - Morphisms into the pushout cannot carry    *)
+  (*    source conventions — source conventions    *)
+  (*    are either identified by the span's       *)
+  (*    equiv relation or simply unreflected at    *)
+  (*    the target.                                *)
+  (*  - Instances needing target-level convention  *)
+  (*    compose Construction with an additional    *)
+  (*    post-quotient that installs convention_eq  *)
+  (*    explicitly.                                *)
   (* ============================================= *)
 
   Definition convention_eq (_ _ : Entity) : Prop := False.
@@ -380,6 +398,68 @@ Module Construction
       unfold rho. rewrite Quot_rec_spec. rewrite Quot_rec_spec.
       rewrite Quot_rec_spec.
       simpl. reflexivity.
+    Qed.
+
+    (* ============================================= *)
+    (*  UNIQUENESS                                   *)
+    (*                                               *)
+    (*  Any other factoring arrow rho' satisfying    *)
+    (*  the same three conditions (interact          *)
+    (*  preservation + agreement on the two          *)
+    (*  injections) agrees pointwise with rho.       *)
+    (*                                               *)
+    (*  Proof by induction on FreeWord: the three    *)
+    (*  conditions determine rho' on generators and  *)
+    (*  Mul propagates via preserves_interact.       *)
+    (* ============================================= *)
+
+    Theorem rho_unique :
+      forall rho' : Entity -> D3.Entity,
+        (forall a b, rho' (interact a b) =
+                     D3.interact (rho' a) (rho' b)) ->
+        (forall x, rho' (inj1 x) = Psi1.phi x) ->
+        (forall y, rho' (inj2 y) = Psi2.phi y) ->
+        forall e, rho' e = rho e.
+    Proof.
+      intros rho' Hpres H1 H2 e.
+      destruct (cls_surjective e) as [w Hw].
+      subst e.
+      induction w as [x | y | u IHu v IHv].
+      - (* Gen1 x *)
+        transitivity (Psi1.phi x).
+        + exact (H1 x).
+        + symmetry. exact (rho_on_inj1 x).
+      - (* Gen2 y *)
+        transitivity (Psi2.phi y).
+        + exact (H2 y).
+        + symmetry. exact (rho_on_inj2 y).
+      - (* Mul u v *)
+        rewrite <- (interact_spec u v).
+        rewrite Hpres.
+        rewrite rho_preserves_interact.
+        rewrite IHu. rewrite IHv. reflexivity.
+    Qed.
+
+    (* Bundled universal property statement. *)
+
+    Theorem pushout_universal :
+      exists rho_star : Entity -> D3.Entity,
+        (forall a b, rho_star (interact a b) =
+                     D3.interact (rho_star a) (rho_star b)) /\
+        (forall x, rho_star (inj1 x) = Psi1.phi x) /\
+        (forall y, rho_star (inj2 y) = Psi2.phi y) /\
+        (forall rho' : Entity -> D3.Entity,
+          (forall a b, rho' (interact a b) =
+                       D3.interact (rho' a) (rho' b)) ->
+          (forall x, rho' (inj1 x) = Psi1.phi x) ->
+          (forall y, rho' (inj2 y) = Psi2.phi y) ->
+          forall e, rho' e = rho_star e).
+    Proof.
+      exists rho.
+      split; [exact rho_preserves_interact |].
+      split; [exact rho_on_inj1 |].
+      split; [exact rho_on_inj2 |].
+      exact rho_unique.
     Qed.
 
   End Universal.

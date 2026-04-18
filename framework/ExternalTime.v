@@ -26,6 +26,8 @@ Require Import Existence.
 From Stdlib Require Import Arith.
 From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
+From Stdlib Require Import List.
+Import ListNotations.
 
 
 Module Type ExternalTimeSig.
@@ -82,4 +84,179 @@ Module ExternalTimeTheory (T : ExternalTimeSig).
     intros a. rewrite interact_self. reflexivity.
   Qed.
 
+  (* ============================================= *)
+  (*  CHAIN-BASED TIME MONOTONICITY                *)
+  (*                                               *)
+  (*  Under a non-self chain, external_time       *)
+  (*  advances by at least the chain length.       *)
+  (*  This is the explicit counter version of     *)
+  (*  the framework's interact_with axiom,        *)
+  (*  giving a lower bound on elapsed events.     *)
+  (* ============================================= *)
+
+  Fixpoint apply_chain (chain : list Entity) (a : Entity) : Entity :=
+    match chain with
+    | [] => a
+    | c :: rest => apply_chain rest (interact a c)
+    end.
+
+  Fixpoint all_non_self (a : Entity) (chain : list Entity) : Prop :=
+    match chain with
+    | [] => True
+    | c :: rest =>
+        interact a c <> a /\ all_non_self (interact a c) rest
+    end.
+
+  (* External time strictly exceeds starting time by
+     at least the length of any non-self chain. *)
+
+  Theorem external_time_advances_on_chain :
+    forall (chain : list Entity) (a : Entity),
+      all_non_self a chain ->
+      external_time (apply_chain chain a) >= external_time a + length chain.
+  Proof.
+    intros chain. induction chain as [| c rest IH].
+    - intros a _. simpl. lia.
+    - intros a [Hne Hrest]. simpl.
+      specialize (IH (interact a c) Hrest).
+      pose proof (external_time_advances_on_nonself a c Hne) as Hstep.
+      lia.
+  Qed.
+
+  (* Non-empty non-self chain strictly advances time. *)
+
+  Theorem external_time_strictly_advances_nonempty_chain :
+    forall (chain : list Entity) (a : Entity),
+      all_non_self a chain ->
+      length chain > 0 ->
+      external_time (apply_chain chain a) > external_time a.
+  Proof.
+    intros chain a Hall Hlen.
+    pose proof (external_time_advances_on_chain chain a Hall) as H.
+    lia.
+  Qed.
+
 End ExternalTimeTheory.
+
+
+(* ================================================ *)
+(*  TIMED MORPHISM                                   *)
+(*                                                   *)
+(*  A morphism between ExternalTimeSig instances    *)
+(*  that preserves (or shifts) the external_time    *)
+(*  counter. Useful for reasoning about time-       *)
+(*  respecting translations between axiom systems.  *)
+(* ================================================ *)
+
+Module TimedMorphism (T1 T2 : ExternalTimeSig).
+
+  Definition preserves_interact (phi : T1.Entity -> T2.Entity) : Prop :=
+    forall a b : T1.Entity,
+      phi (T1.interact a b) = T2.interact (phi a) (phi b).
+
+  (* External time is preserved exactly. *)
+
+  Definition preserves_external_time (phi : T1.Entity -> T2.Entity) : Prop :=
+    forall a : T1.Entity,
+      T2.external_time (phi a) = T1.external_time a.
+
+  (* External time is shifted by a constant delta. *)
+
+  Definition shifts_external_time
+    (phi : T1.Entity -> T2.Entity) (delta : nat) : Prop :=
+    forall a : T1.Entity,
+      T2.external_time (phi a) = T1.external_time a + delta.
+
+  (* Timed morphism: interact + exact time preservation. *)
+
+  Definition timed_morphism (phi : T1.Entity -> T2.Entity) : Prop :=
+    preserves_interact phi /\ preserves_external_time phi.
+
+  (* Exact preservation is shifting by zero. *)
+
+  Theorem preserves_is_shift_zero :
+    forall phi,
+      preserves_external_time phi -> shifts_external_time phi 0.
+  Proof.
+    intros phi H a. rewrite H. lia.
+  Qed.
+
+  Theorem shift_zero_is_preserves :
+    forall phi,
+      shifts_external_time phi 0 -> preserves_external_time phi.
+  Proof.
+    intros phi H a. rewrite H. lia.
+  Qed.
+
+End TimedMorphism.
+
+
+(* ================================================ *)
+(*  TIMED COMPOSITION                                *)
+(* ================================================ *)
+
+Module TimedCompose (T1 T2 T3 : ExternalTimeSig).
+
+  Definition compose
+    (psi : T2.Entity -> T3.Entity)
+    (phi : T1.Entity -> T2.Entity) : T1.Entity -> T3.Entity :=
+    fun x => psi (phi x).
+
+  Theorem compose_preserves_interact :
+    forall psi phi,
+      (forall a b,
+        phi (T1.interact a b) = T2.interact (phi a) (phi b)) ->
+      (forall a b,
+        psi (T2.interact a b) = T3.interact (psi a) (psi b)) ->
+      forall a b,
+        compose psi phi (T1.interact a b) =
+        T3.interact (compose psi phi a) (compose psi phi b).
+  Proof.
+    intros psi phi Hphi Hpsi a b.
+    unfold compose. rewrite Hphi. apply Hpsi.
+  Qed.
+
+  Theorem compose_preserves_external_time :
+    forall psi phi,
+      (forall a, T2.external_time (phi a) = T1.external_time a) ->
+      (forall a, T3.external_time (psi a) = T2.external_time a) ->
+      forall a, T3.external_time (compose psi phi a) = T1.external_time a.
+  Proof.
+    intros psi phi Hphi Hpsi a. unfold compose.
+    rewrite Hpsi. apply Hphi.
+  Qed.
+
+  (* Shifts compose additively. *)
+
+  Theorem compose_shifts_external_time :
+    forall psi phi k1 k2,
+      (forall a, T2.external_time (phi a) = T1.external_time a + k1) ->
+      (forall a, T3.external_time (psi a) = T2.external_time a + k2) ->
+      forall a, T3.external_time (compose psi phi a) =
+                T1.external_time a + (k1 + k2).
+  Proof.
+    intros psi phi k1 k2 Hphi Hpsi a. unfold compose.
+    rewrite Hpsi. rewrite Hphi. lia.
+  Qed.
+
+  Theorem compose_of_timed_morphisms :
+    forall psi phi,
+      (forall a b,
+        phi (T1.interact a b) = T2.interact (phi a) (phi b)) ->
+      (forall a, T2.external_time (phi a) = T1.external_time a) ->
+      (forall a b,
+        psi (T2.interact a b) = T3.interact (psi a) (psi b)) ->
+      (forall a, T3.external_time (psi a) = T2.external_time a) ->
+      (forall a b,
+        compose psi phi (T1.interact a b) =
+        T3.interact (compose psi phi a) (compose psi phi b)) /\
+      (forall a, T3.external_time (compose psi phi a) =
+                 T1.external_time a).
+  Proof.
+    intros psi phi Hi1 Ht1 Hi2 Ht2.
+    split.
+    - apply compose_preserves_interact; assumption.
+    - apply compose_preserves_external_time; assumption.
+  Qed.
+
+End TimedCompose.
