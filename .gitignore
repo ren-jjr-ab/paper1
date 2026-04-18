@@ -18,9 +18,9 @@ Makefile.conf
 # Rocq native compilation
 .coq-native/
 
-# Local README (not for public repo)
-README.md
 
 # Audit compiled artifacts (source is kept; compiled output isn't)
 results/AssumptionsAudit.vo
 results/AssumptionsAudit.glob
+
+scev-demo/target

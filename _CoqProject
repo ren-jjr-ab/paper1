@@ -21,6 +21,8 @@ framework/ExistencePushout.v
 framework/ExistenceEqualizer.v
 framework/ExistenceCoequalizer.v
 framework/ExistenceFactorization.v
+framework/Ring.v
+framework/RingMorphism.v
 
 # ============================================================
 # Layer 1 — existences (each inhabits some ExistenceSig-family)
@@ -38,6 +40,17 @@ existences/EpsilonDelta.v
 existences/SemilatticeInstances.v
 existences/IntegerGrothendieck.v
 existences/DedekindReal.v
+existences/ElemSig.v
+existences/SymbolicSet.v
+existences/NatSet.v
+existences/NatSetSet.v
+existences/IntegerRing.v
+existences/ModularRing.v
+existences/PolynomialRing.v
+existences/FinSetRing.v
+existences/RingAsEntity.v
+existences/RingAsEntity_WithConv.v
+existences/PureMarkerEntity.v
 existences/RationalRep.v
 existences/CauchyReal.v
 
@@ -66,6 +79,16 @@ results/RationalCauchyFactorization.v
 results/IntegerGrothendieckFactorization.v
 results/ModularCoequalizer.v
 results/DedekindCauchyIsomorphism.v
+results/NatSetExtensionality.v
+results/IntegerToModularRingMorphism.v
+results/MultivariatePolynomial.v
+results/PolynomialEvaluation.v
+results/RealTower.v
+results/BooleanSetPolynomial.v
+results/CantorTheorem.v
+results/RussellParadox.v
+results/MarkerUniverseEmbedding.v
+results/BoolPolyAsEntity.v
 
 ## Analysis witnesses
 results/CauchyLimits.v
