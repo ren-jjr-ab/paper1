@@ -776,7 +776,7 @@ is what `convention_not_derivable` requires.#footnote[
 A central instance witness: the constant-$1$
 sequence and the sequence $1 + 1 \/ (n + 1)$ are
 $approx$.#footnote[`const_sum_convention_eq`
-in `results/CauchyRealTest.v`. The
+in `tests/CauchyRealTest.v`. The
 $epsilon$-$delta$ inequality is proved by taking
 $N := k$.]
 
