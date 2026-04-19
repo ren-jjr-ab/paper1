@@ -5,7 +5,7 @@ An axiom system that separates the single symbol `=` into three relations:
 verified in Coq, with zero `Admitted`.
 
 - **Paper:** [`paper.typ`](./paper.typ) / `paper.pdf` — core theory, ~12 pages.
-- **Mechanization:** 81 `.v` files across four layers, ~21,850 lines of Coq.
+- **Mechanization:** 83 `.v` files across four layers, ~22,300 lines of Coq.
 - **Demo:** [`scev-demo/`](./scev-demo/) — Rust companion for the
   `lim sin(x)/x` budget experiment (paper §4.1.1).
 
@@ -13,8 +13,8 @@ verified in Coq, with zero `Admitted`.
 
 ```
 framework/   (14)  Primitives, axioms, categorical composition, Ring interface.
-existences/  (25)  Concrete Entity types satisfying ExistenceSig or extensions.
-results/     (27)  Main theorems and cross-instance mathematics.
+existences/  (26)  Concrete Entity types satisfying ExistenceSig or extensions.
+results/     (28)  Main theorems and cross-instance mathematics.
 tests/       (15)  Functor verification, instance suites, assumption audit.
 paper.typ          Typst source for the paper body.
 scev-demo/         Rust demo (Section 4.1.1 budget/precision experiment).
@@ -117,6 +117,11 @@ or `DecEqCommRingSig`.
 - `SemilatticeInstances.v` — concrete semilattices.
 - `PureMarkerEntity.v` — degenerate instance: `Entity = nat`, pure
   viewpoints without data. The minimal inhabitant of `ExistenceSig`.
+- `ObjectMirror.v` — physics-flavoured instance exposing the
+  asymmetry of `interact`. Object viewed through Mirror attenuates
+  by the mirror's coefficient; Mirror viewed through Object decays
+  by a factor of ten. `interact a b ≠ interact b a` (often with
+  different constructors on each side).
 
 ### Set theory
 
@@ -218,6 +223,15 @@ Main framework theorems and cross-instance math.
 - `CauchyLimits.v` — pointwise-equality witnesses for polynomial
   identities: `(a+b)² = a² + 2ab + b²` etc.
 
+### Programs as Entities
+
+- `SKIComputationalWitnesses.v` — applies `FrameworkHalting` and
+  `FrameworkRice` to `SKIComputable`. `interact` is literally one
+  reduction step (`reflexivity` witnesses step-by-step execution).
+  Collapse witnesses `(KK)S` and `(KK)I` both reduce to `TK`,
+  yielding Rice's no-universal-decoder for SKI as a corollary of the
+  abstract framework theorem. Divergent witness: `(SII)(SII)`.
+
 ---
 
 ## Layer 3 — tests/
@@ -274,6 +288,9 @@ Main framework theorems and cross-instance math.
   → `ExistenceCoequalizer.v` → `ExistenceFactorization.v`.
 - **Cross-instance transport:** `results/RationalToCauchyMorphism.v` →
   `results/RationalCauchy{Product,Pullback,Pushout,Factorization}.v`.
+- **Programs as Entities:** `existences/SKIModel.v` →
+  `results/SKIComputationalWitnesses.v` (`interact` = one-step
+  reduction; Rice and Halting applied to SKI).
 
 ---
 
@@ -295,6 +312,8 @@ Main framework theorems and cross-instance math.
 | Mod-7 equivalence as framework `≈` | `existences/RingAsEntity_WithConv.v` | bridge |
 | Marker universe ring-independent | `results/MarkerUniverseEmbedding.v` | bridge |
 | 4-layer stack as single Entity | `results/BoolPolyAsEntity.v` | composition |
+| Rice + Halting specialised to SKI | `results/SKIComputationalWitnesses.v` | computational |
+| `interact` asymmetry made physical | `existences/ObjectMirror.v` | asymmetry witness |
 
 ---
 

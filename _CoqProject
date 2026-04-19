@@ -51,6 +51,7 @@ existences/FinSetRing.v
 existences/RingAsEntity.v
 existences/RingAsEntity_WithConv.v
 existences/PureMarkerEntity.v
+existences/ObjectMirror.v
 existences/RationalRep.v
 existences/CauchyReal.v
 
@@ -89,6 +90,8 @@ results/CantorTheorem.v
 results/RussellParadox.v
 results/MarkerUniverseEmbedding.v
 results/BoolPolyAsEntity.v
+results/SKIComputationalWitnesses.v
+results/ObjectMirrorRice.v
 
 ## Analysis witnesses
 results/CauchyLimits.v
