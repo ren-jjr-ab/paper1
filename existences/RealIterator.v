@@ -41,7 +41,7 @@ Record RIEnt := {
 }.
 
 (* One refinement step. The cost update matches the
-   standard Computable-level formulas: storage gains
+   standard Materialized-level formulas: storage gains
    the information size of the source, and flip
    gains max 1 growth. Here growth is always 1
    (precision increments by one each step), so flip

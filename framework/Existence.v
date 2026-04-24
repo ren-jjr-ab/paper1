@@ -3,7 +3,7 @@
 (*                                             *)
 (*  Three primitives, five axioms. Entity is   *)
 (*  the sole type. interact is a binary        *)
-(*  operation on entities. convention_eq is a  *)
+(*  operation on entities. collapse is a       *)
 (*  binary relation that records equalities    *)
 (*  no interaction can witness.                *)
 (*                                             *)
@@ -17,21 +17,20 @@
 (*    Entity        : Type                     *)
 (*    interact      : Entity -> Entity         *)
 (*                    -> Entity                *)
-(*    convention_eq : Entity -> Entity         *)
+(*    collapse      : Entity -> Entity         *)
 (*                    -> Prop                  *)
 (*                                             *)
 (*  Axioms:                                    *)
 (*    interact_self                            *)
 (*      interact a a = a                       *)
-(*    interact_decidable                       *)
-(*      {interact a c = interact b c}          *)
-(*       + {interact a c <> interact b c}      *)
+(*    entity_eq_dec                            *)
+(*      {a = b} + {a <> b}                     *)
 (*    existence                                *)
 (*      exists a b, a <> b                     *)
 (*    interact_with                            *)
 (*      forall a, exists b, interact a b <> a  *)
-(*    convention_not_derivable                 *)
-(*      convention_eq a b ->                   *)
+(*    interaction_cannot_witness_collapse      *)
+(*      collapse a b ->                        *)
 (*      forall c, interact a c <> interact b c *)
 (*                                             *)
 (*  Meta-level: we use propositional equality  *)
@@ -43,18 +42,19 @@
 (*                                             *)
 (*  Derived theory (ExistenceTheory):          *)
 (*    interact_eq_at, preserves_at, dichotomy, *)
+(*    interact_decidable (from entity_eq_dec), *)
 (*    interaction_reflects_diff,               *)
 (*    is_terminal, is_terminal_impossible,     *)
 (*    viewpoint_has_fixed_point,               *)
-(*    convention_eq_distinct,                  *)
-(*    convention_eq_irreflexive,               *)
+(*    collapse_distinct_entities,              *)
+(*    collapse_irreflexive,                    *)
 (*    observationally_equivalent,              *)
 (*    observational_equivalence_reflexive,     *)
 (*    observational_equivalence_excludes_      *)
-(*      convention.                            *)
+(*      collapse.                              *)
 (*                                             *)
 (*  Extensions:                                *)
-(*    framework/Computable.v                   *)
+(*    framework/Materialized.v                 *)
 (*      info_size, storage_cost, flip_cost     *)
 (*    framework/Iterable.v                     *)
 (*      remaining                              *)
@@ -72,13 +72,13 @@ Module Type ExistenceSig.
      instance-determined. *)
   Parameter interact : Entity -> Entity -> Entity.
 
-  (* Binary relation on entities. convention_eq a b
+  (* Binary relation on entities. collapse a b
      asserts a user-level equivalence that no
      interaction is required to witness — two
-     entities can be declared equal by convention
+     entities can be declared equal by collapse
      while remaining distinguishable under every
      viewpoint. *)
-  Parameter convention_eq : Entity -> Entity -> Prop.
+  Parameter collapse : Entity -> Entity -> Prop.
 
   (* ============================================= *)
   (*  AXIOMS                                       *)
@@ -88,11 +88,9 @@ Module Type ExistenceSig.
      unchanged. *)
   Axiom interact_self : forall a : Entity, interact a a = a.
 
-  (* Interaction equality at a common viewpoint is
-     decidable. *)
-  Axiom interact_decidable :
-    forall a b c : Entity,
-      {interact a c = interact b c} + {interact a c <> interact b c}.
+  (* Entity equality is decidable. *)
+  Axiom entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b}.
 
   (* At least two entities exist — there is some
      difference for the framework to carry. *)
@@ -106,14 +104,14 @@ Module Type ExistenceSig.
   Axiom interact_with :
     forall a : Entity, exists b, interact a b <> a.
 
-  (* Convention is not derivable from interaction. If
-     two entities are related by convention, their
+  (* Collapse is not derivable from interaction. If
+     two entities are related by collapse, their
      interactions disagree at every viewpoint — so
      no interaction-derived equality can ever bridge
      them from inside the framework. *)
-  Axiom convention_not_derivable :
+  Axiom interaction_cannot_witness_collapse :
     forall (a b : Entity),
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity,
         interact a c <> interact b c.
 
@@ -127,6 +125,19 @@ End ExistenceSig.
 Module ExistenceTheory (D : ExistenceSig).
 
   Import D.
+
+  (* ================================================ *)
+  (*  INTERACTION DECIDABILITY                        *)
+  (*                                                  *)
+  (*  Derived from entity_eq_dec: if entities are     *)
+  (*  decidably equal, so are their interaction       *)
+  (*  results at any common viewpoint.                *)
+  (* ================================================ *)
+
+  Theorem interact_decidable :
+    forall a b c : Entity,
+      {interact a c = interact b c} + {interact a c <> interact b c}.
+  Proof. intros. apply entity_eq_dec. Qed.
 
   (* ================================================ *)
   (*  INTERACTION EQUALITY AT A VIEWPOINT             *)
@@ -229,37 +240,37 @@ Module ExistenceTheory (D : ExistenceSig).
   Qed.
 
   (* ================================================ *)
-  (*  CONVENTION FORCES DISTINCTNESS                  *)
+  (*  COLLAPSE FORCES DISTINCTNESS                    *)
   (*                                                  *)
-  (*  convention_not_derivable, read through the      *)
-  (*  self-viewpoint, forces convention-equal pairs   *)
-  (*  to be distinct — and therefore convention_eq    *)
+  (*  interaction_cannot_witness_collapse, read       *)
+  (*  through the self-viewpoint, forces collapse     *)
+  (*  pairs to be distinct — and therefore collapse   *)
   (*  itself to be irreflexive. ≡ is reflexive; ≈ is  *)
   (*  irreflexive. That is the first sign of their    *)
   (*  antipodal position.                             *)
   (* ================================================ *)
 
-  Theorem convention_eq_distinct :
-    forall a b, convention_eq a b -> a <> b.
+  Theorem collapse_distinct_entities :
+    forall a b, collapse a b -> a <> b.
   Proof.
     intros a b Hconv Heq.
     subst b.
-    apply (convention_not_derivable a a Hconv a).
+    apply (interaction_cannot_witness_collapse a a Hconv a).
     reflexivity.
   Qed.
 
-  Theorem convention_eq_irreflexive :
-    forall a, ~ convention_eq a a.
+  Theorem collapse_irreflexive :
+    forall a, ~ collapse a a.
   Proof.
     intros a H.
-    apply (convention_eq_distinct a a H). reflexivity.
+    apply (collapse_distinct_entities a a H). reflexivity.
   Qed.
 
   (* ================================================ *)
-  (*  OBSERVATIONAL EQUIVALENCE vs CONVENTION         *)
+  (*  OBSERVATIONAL EQUIVALENCE vs COLLAPSE           *)
   (*                                                  *)
   (*  Two entities are observationally equivalent     *)
-  (*  when they agree at every viewpoint. Convention  *)
+  (*  when they agree at every viewpoint. Collapse    *)
   (*  denies exactly what observational equivalence   *)
   (*  grants: no pair can satisfy both.               *)
   (* ================================================ *)
@@ -273,12 +284,12 @@ Module ExistenceTheory (D : ExistenceSig).
     intros a c. reflexivity.
   Qed.
 
-  Theorem observational_equivalence_excludes_convention :
+  Theorem observational_equivalence_excludes_collapse :
     forall a b,
-      observationally_equivalent a b -> ~ convention_eq a b.
+      observationally_equivalent a b -> ~ collapse a b.
   Proof.
     intros a b Hobs Hconv.
-    apply (convention_not_derivable a b Hconv a).
+    apply (interaction_cannot_witness_collapse a b Hconv a).
     apply Hobs.
   Qed.
 

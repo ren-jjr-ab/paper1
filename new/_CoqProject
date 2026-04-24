@@ -1,0 +1,93 @@
+-R Existence ""
+-R Witnessed ""
+-R Materialized ""
+-R Structure/Algebra ""
+-R Structure/Categorical ""
+-Q Structure/Set ""
+-R Results ""
+-Q Tests ""
+
+-arg -native-compiler -arg no
+
+Structure/Algebra/Semiring.v
+Structure/Algebra/NatSemiring.v
+Structure/Algebra/Ring.v
+Structure/Algebra/IntegerRing.v
+Structure/Algebra/ModularRing.v
+Structure/Algebra/PolynomialRing.v
+Structure/Algebra/FinSetRing.v
+Structure/Algebra/Field.v
+Structure/Algebra/RationalField.v
+Existence/Existence.v
+Existence/Theory.v
+Existence/Us.v
+Existence/SemiringAsExistence.v
+Existence/RingAsExistence.v
+Existence/FieldAsExistence.v
+Existence/N.v
+Existence/Integer.v
+Existence/Q.v
+Witnessed/Witnessed.v
+Witnessed/LatticeWitnessed.v
+Witnessed/SemiringAsWitnessed.v
+Witnessed/RingAsWitnessed.v
+Witnessed/FieldAsWitnessed.v
+Witnessed/N.v
+Witnessed/Z.v
+Witnessed/Mod7.v
+Witnessed/Q.v
+Witnessed/Cauchy.v
+Witnessed/Dedekind.v
+Materialized/Materialized.v
+Structure/Categorical/Morphism.v
+Structure/Categorical/RingMorphism.v
+Structure/Categorical/Product.v
+Structure/Categorical/Equalizer.v
+Structure/Categorical/Coequalizer.v
+Structure/Categorical/Factorization.v
+Structure/Categorical/Pullback.v
+Structure/Categorical/Pushout.v
+Structure/Categorical/CauchyDedekind.v
+Witnessed/Models/ElemSig.v
+Witnessed/Models/IntegerGrothendieck.v
+Witnessed/Models/NatSet.v
+Witnessed/Models/NatSetSet.v
+Witnessed/Models/RationalRep.v
+Witnessed/Models/SemilatticeInstances.v
+Witnessed/Models/SymbolicSet.v
+Witnessed/Bizarre/ConsistencyModelPD.v
+Witnessed/Bizarre/ObjectMirror.v
+Materialized/Models/EpsilonDelta.v
+Materialized/Models/HashModel.v
+Materialized/Models/LatticeModel.v
+Materialized/Models/PolyModel.v
+Results/Meta/Cantor.v
+Results/Meta/Russell.v
+Results/Meta/Trichotomy.v
+Results/Set/NatSetExtensionality.v
+Results/Framework/Irreversibility.v
+Results/Number/CauchyLimits.v
+Results/Number/IntegerGrothendieckFactorization.v
+Results/Number/IntegerToModularRingMorphism.v
+Results/Number/ModularCoequalizer.v
+Results/Number/RationalCauchyFactorization.v
+Results/Number/RationalCauchyProduct.v
+Results/Number/RationalCauchyPullback.v
+Results/Number/RationalCauchyPushout.v
+Results/Number/RationalToCauchyMorphism.v
+Results/Number/NZQRTower.v
+Results/Polynomial/MultivariatePolynomial.v
+Results/Polynomial/PolynomialEvaluation.v
+Results/Bizarre/ObjectMirrorRice.v
+Results/Bizarre/Rice.v
+Tests/RationalRepTest.v
+Tests/CauchyTest.v
+Results/Bizarre/BooleanSetPolynomial.v
+Witnessed/Bizarre/PureMarkerEntity.v
+Results/Bizarre/BoolPolyAsEntity.v
+Results/Bizarre/ScaleInvariantCost.v
+Results/Bizarre/RiceCost.v
+Existence/Bizarre/SKI.v
+Results/Bizarre/FrameworkHalting.v
+Results/Bizarre/SKIWitnesses.v
+Results/Bizarre/Halting.v

@@ -133,7 +133,7 @@ Module Construction
   (*  introduced by the construction.              *)
   (* ============================================= *)
 
-  Definition convention_eq (_ _ : Entity) : Prop := False.
+  Definition collapse (_ _ : Entity) : Prop := False.
 
   (* ============================================= *)
   (*  interact_self (PROVED)                       *)
@@ -149,15 +149,15 @@ Module Construction
   Qed.
 
   (* ============================================= *)
-  (*  convention_not_derivable (VACUOUS)           *)
+  (*  interaction_cannot_witness_collapse (VACUOUS)           *)
   (* ============================================= *)
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall a b : Entity,
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity, interact a c <> interact b c.
   Proof.
-    intros a b Hconv. unfold convention_eq in Hconv. destruct Hconv.
+    intros a b Hconv. unfold collapse in Hconv. destruct Hconv.
   Qed.
 
   (* ============================================= *)

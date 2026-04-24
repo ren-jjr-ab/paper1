@@ -19,7 +19,7 @@
 (*     morphism_carries_agreement. No ad-hoc        *)
 (*     re-proof.                                    *)
 (*                                                  *)
-(*  3. CauchyReal's convention_eq has no phi        *)
+(*  3. CauchyReal's collapse has no phi        *)
 (*     pre-image — CTSum / CTInvSucc / CTScale /    *)
 (*     CTNeg shapes are outside phi's range. The    *)
 (*     ≈ layer is genuinely new information.        *)
@@ -27,7 +27,7 @@
 
 Require Existence.
 Require ExistenceMorphism.
-Require ExternalTime.
+Require Witnessed.
 Require RationalRep.
 Require CauchyReal.
 Require RationalRepTest.
@@ -195,7 +195,7 @@ Qed.
 (*  is a CTSum shape. phi never produces       *)
 (*  CTSum. Therefore no RR entity maps to      *)
 (*  REnt one_plus_invsucc _, and the           *)
-(*  convention_eq pair involving it is         *)
+(*  collapse pair involving it is         *)
 (*  strictly outside phi's range.              *)
 (* =========================================== *)
 
@@ -289,10 +289,10 @@ Example half_and_fourth_paper_projection :
   CR.interact fourth_image (CR.CEval 0 0).
 Proof. reflexivity. Qed.
 
-(* (c) NOT ≈ (not convention_eq; pointwise EQUAL
+(* (c) NOT ≈ (not collapse; pointwise EQUAL
        contradicts pointwise_distinct) *)
 Example half_and_fourth_not_convention :
-  ~ CR.convention_eq half_image fourth_image.
+  ~ CR.collapse half_image fourth_image.
 Proof.
   intros [_ [_ Hpd]].
   apply (Hpd 0%nat). simpl. reflexivity.
@@ -316,14 +316,14 @@ Proof. intro H. inversion H. Qed.
 (*                                             *)
 (*  Strongest non-liftability result:          *)
 (*  NO pair a, b in RationalRep produces a     *)
-(*  convention_eq pair in CauchyReal under     *)
+(*  collapse pair in CauchyReal under     *)
 (*  phi.                                       *)
 (*                                             *)
 (*  Structural reason — phi's image is         *)
 (*  constant-sequence-or-CEval-only. Two       *)
 (*  constants being cauchy_equivalent forces   *)
 (*  their Q-values to agree (archimedean),     *)
-(*  but convention_eq also demands pointwise   *)
+(*  but collapse also demands pointwise   *)
 (*  distinctness — contradiction.              *)
 (* =========================================== *)
 
@@ -386,7 +386,7 @@ Qed.
 
 Theorem phi_cannot_witness_convention :
   forall a b : RR.Entity,
-    ~ CR.convention_eq (phi a) (phi b).
+    ~ CR.collapse (phi a) (phi b).
 Proof.
   intros a b Hconv.
   destruct a as [q1 t1 | t1]; destruct b as [q2 t2 | t2];

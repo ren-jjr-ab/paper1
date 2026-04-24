@@ -1,28 +1,28 @@
 (* ============================================== *)
-(*  LatticeExternalTimed — lattice-like op lifted  *)
-(*                          to ExternalTimeSig     *)
+(*  LatticeWitnessed — lattice-like op lifted       *)
+(*                     to WitnessedSig              *)
 (*                                                  *)
 (*  Given an idempotent binary operation on a       *)
 (*  type T with decidable equality and at least     *)
-(*  two distinct values (LatticeSpec), produces an  *)
-(*  ExternalTimeSig instance whose Entity is T      *)
+(*  two distinct values (LatticeSpec), produces a   *)
+(*  WitnessedSig instance whose Entity is T         *)
 (*  paired with an explicit time counter.           *)
 (*                                                  *)
 (*  Interaction semantics:                          *)
 (*    self     → identity (no event).               *)
 (*    non-self → apply op on value coord and        *)
-(*               advance external_time by one.      *)
+(*               advance witness_time by one.       *)
 (*                                                  *)
 (*  Every ExistenceSig axiom plus                   *)
-(*  external_time_advances_on_nonself derives from  *)
+(*  witness_advances_on_nonself derives from        *)
 (*  the three LatticeSpec obligations. No           *)
 (*  absorbing-element concern: bottom value         *)
 (*  entities still have movers through the          *)
-(*  external_time coord.                            *)
+(*  witness_time coord.                             *)
 (* ============================================== *)
 
 Require Import Existence.
-Require Import ExternalTime.
+Require Import Witnessed.
 From Stdlib Require Import Arith.
 From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
@@ -37,7 +37,7 @@ Module Type LatticeSpec.
 End LatticeSpec.
 
 
-Module Make (L : LatticeSpec) <: ExternalTimeSig.
+Module Make (L : LatticeSpec) <: WitnessedSig.
 
   Definition Entity : Type := (L.T * nat)%type.
 
@@ -58,9 +58,9 @@ Module Make (L : LatticeSpec) <: ExternalTimeSig.
                   S (Nat.max (snd a) (snd b)))
     end.
 
-  Definition convention_eq (_ _ : Entity) : Prop := False.
+  Definition collapse (_ _ : Entity) : Prop := False.
 
-  Definition external_time (a : Entity) : nat := snd a.
+  Definition witness_time (a : Entity) : nat := snd a.
 
   Theorem interact_self : forall a : Entity, interact a a = a.
   Proof.
@@ -68,14 +68,6 @@ Module Make (L : LatticeSpec) <: ExternalTimeSig.
     destruct (entity_eq_dec a a) as [Heq | Hne].
     - reflexivity.
     - exfalso. apply Hne. reflexivity.
-  Qed.
-
-  Theorem interact_decidable :
-    forall a b c : Entity,
-      {interact a c = interact b c} +
-      {interact a c <> interact b c}.
-  Proof.
-    intros a b c. apply entity_eq_dec.
   Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
@@ -97,24 +89,24 @@ Module Make (L : LatticeSpec) <: ExternalTimeSig.
       rewrite Hmax in H. lia.
   Qed.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall a b : Entity,
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity, interact a c <> interact b c.
   Proof.
     intros a b H. destruct H.
   Qed.
 
-  Theorem external_time_advances_on_nonself :
+  Theorem witness_advances_on_nonself :
     forall a c : Entity,
       interact a c <> a ->
-      external_time (interact a c) > external_time a.
+      witness_time (interact a c) > witness_time a.
   Proof.
     intros a c Hne.
     unfold interact in Hne. unfold interact.
     destruct (entity_eq_dec a c) as [Heq | Hne_ac].
     - exfalso. apply Hne. reflexivity.
-    - unfold external_time. simpl. lia.
+    - unfold witness_time. simpl. lia.
   Qed.
 
 End Make.

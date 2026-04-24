@@ -31,7 +31,7 @@ From Stdlib Require Import Eqdep_dec.
 Import ListNotations.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 
 (* ================================================ *)
 (*  EXPRESSIONS                                      *)
@@ -258,7 +258,7 @@ Proof. reflexivity. Qed.
 (* ================================================ *)
 (*  FRAMEWORK INSTANCE                               *)
 (*                                                   *)
-(*  PolyModel lifted to ComputableExistenceSig so    *)
+(*  PolyModel lifted to MaterializedExistenceSig so    *)
 (*  that storage_cost and flip_cost from the         *)
 (*  framework apply. Entities wrap an Expr together  *)
 (*  with the current category and the two cost       *)
@@ -359,7 +359,7 @@ Lemma pm_freeze_injective :
   forall a b, pm_freeze a = pm_freeze b -> a = b.
 Proof. intros a b H. unfold pm_freeze in H. inversion H. reflexivity. Qed.
 
-Module PolyComputable <: ComputableExistenceSig.
+Module PolyComputable <: MaterializedExistenceSig.
 
   Definition Entity : Type := PMEnt.
 
@@ -389,10 +389,13 @@ Module PolyComputable <: ComputableExistenceSig.
       left. subst. reflexivity.
   Defined.
 
+  Definition entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b} := pm_eq_dec.
+
   Theorem interact_decidable :
     forall a b c : Entity,
       {interact a c = interact b c} + {interact a c <> interact b c}.
-  Proof. intros. apply pm_eq_dec. Qed.
+  Proof. intros. apply entity_eq_dec. Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
   Proof.
@@ -411,15 +414,15 @@ Module PolyComputable <: ComputableExistenceSig.
     rewrite H in Hd. lia.
   Qed.
 
-  Definition convention_eq : Entity -> Entity -> Prop :=
+  Definition collapse : Entity -> Entity -> Prop :=
     fun _ _ => False.
 
-  Theorem convention_not_derivable :
-    forall a b, convention_eq a b ->
+  Theorem interaction_cannot_witness_collapse :
+    forall a b, collapse a b ->
     forall c, interact a c <> interact b c.
   Proof. intros a b H. exfalso. exact H. Qed.
 
-  (* ---- Computable layer ---- *)
+  (* ---- Materialized layer ---- *)
 
   Definition info_size (e : Entity) : nat := pm_info e.
   Definition storage_cost (e : Entity) : nat := pm_stor e.
@@ -494,7 +497,7 @@ End PolyComputable.
 (*  freeze_preserves_existence at the Entity level.  *)
 (* ================================================ *)
 
-Module PMCT := ComputableExistenceTheory PolyComputable.
+Module PMCT := MaterializedExistenceTheory PolyComputable.
 Import PolyComputable PMCT.
 
 Definition freeze (e : Entity) : Entity := pm_freeze e.

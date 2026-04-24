@@ -2,7 +2,7 @@
 (*  HashModel.v                                      *)
 (*                                                   *)
 (*  FxHash-style evaluator as a                      *)
-(*  ComputableExistenceSig instance.                 *)
+(*  MaterializedExistenceSig instance.                 *)
 (*                                                   *)
 (*  This file does not model 64-bit FxHash           *)
 (*  bit-by-bit. It captures only what the framework  *)
@@ -49,7 +49,7 @@ From Stdlib Require Import List.
 Import ListNotations.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 
 (* ================================================ *)
 (*  ENTITY                                           *)
@@ -101,7 +101,7 @@ Definition dim_as_entity (d : nat) : HEnt := HNormal d [] 0 0.
 (*  stages. The exact numeric values do not matter;  *)
 (*  what matters is that the transitions are lossy   *)
 (*  in specific places, and that info_size evolves   *)
-(*  in a way the Computable axioms can account for.  *)
+(*  in a way the Materialized axioms can account for.  *)
 (*                                                   *)
 (*  h_next_vals collapses the shape the same way at  *)
 (*  every stage: the current shape is summed into a  *)
@@ -165,7 +165,7 @@ Qed.
 (*  SIGNATURE INSTANCE                               *)
 (* ================================================ *)
 
-Module HashComputable <: ComputableExistenceSig.
+Module HashComputable <: MaterializedExistenceSig.
 
   Definition Entity : Type := HEnt.
 
@@ -205,10 +205,13 @@ Module HashComputable <: ComputableExistenceSig.
       left. subst. reflexivity.
   Defined.
 
+  Definition entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b} := h_eq_dec.
+
   Theorem interact_decidable :
     forall a b c : Entity,
       {interact a c = interact b c} + {interact a c <> interact b c}.
-  Proof. intros. apply h_eq_dec. Qed.
+  Proof. intros. apply entity_eq_dec. Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
   Proof.
@@ -227,17 +230,17 @@ Module HashComputable <: ComputableExistenceSig.
     rewrite H in Hd. lia.
   Qed.
 
-  Definition convention_eq : Entity -> Entity -> Prop :=
+  Definition collapse : Entity -> Entity -> Prop :=
     fun _ _ => False.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall (a b : Entity),
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity,
         interact a c <> interact b c.
   Proof. intros a b H. exfalso. exact H. Qed.
 
-  (* ---- Computable layer ---- *)
+  (* ---- Materialized layer ---- *)
 
   Definition info_size (e : Entity) : nat := h_info e.
   Definition storage_cost (e : Entity) : nat := h_stor e.
@@ -288,7 +291,7 @@ End HashComputable.
 (*  INSTANCE-INTERNAL FREEZE                         *)
 (* ================================================ *)
 
-Module HCT := ComputableExistenceTheory HashComputable.
+Module HCT := MaterializedExistenceTheory HashComputable.
 Import HashComputable HCT.
 
 Definition freeze (e : Entity) : Entity := h_freeze e.

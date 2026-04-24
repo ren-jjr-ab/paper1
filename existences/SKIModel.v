@@ -4,7 +4,7 @@
 (*  SKI combinator calculus as a framework           *)
 (*  instance. Each combinator reduction is one       *)
 (*  interact step; storage and flip costs follow     *)
-(*  the Computable layer formulas.                   *)
+(*  the Materialized layer formulas.                   *)
 (*                                                   *)
 (*  Rules:                                           *)
 (*    I x     -> x                                   *)
@@ -13,7 +13,7 @@
 (*                                                   *)
 (*  SKI is Turing complete, so halting is            *)
 (*  undecidable in general. This instance            *)
-(*  implements IterableComputableSig by bounding     *)
+(*  implements IterableMaterializedSig by bounding     *)
 (*  reduction with reduce_try under a fuel cap,      *)
 (*  and reports a step count only when termination   *)
 (*  is witnessed within that budget.                 *)
@@ -25,7 +25,7 @@ From Stdlib Require Import Lia.
 From Stdlib Require Import Eqdep_dec.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 Require Import Iterable.
 
 (* ================================================ *)
@@ -309,7 +309,7 @@ Fixpoint ski_remaining_fn (e : SKIEnt) : option nat :=
   | SKIFrozen _ _ _ _   => Some 0
   end.
 
-Module SKIComputable <: IterableComputableSig.
+Module SKIComputable <: IterableMaterializedSig.
 
   Definition Entity : Type := SKIEnt.
 
@@ -339,10 +339,13 @@ Module SKIComputable <: IterableComputableSig.
       left. subst. reflexivity.
   Defined.
 
+  Definition entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b} := skient_eq_dec.
+
   Theorem interact_decidable :
     forall a b c : Entity,
       {interact a c = interact b c} + {interact a c <> interact b c}.
-  Proof. intros. apply skient_eq_dec. Qed.
+  Proof. intros. apply entity_eq_dec. Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
   Proof.
@@ -361,10 +364,10 @@ Module SKIComputable <: IterableComputableSig.
     rewrite H in Hd. lia.
   Qed.
 
-  Definition convention_eq : Entity -> Entity -> Prop := fun _ _ => False.
+  Definition collapse : Entity -> Entity -> Prop := fun _ _ => False.
 
-  Theorem convention_not_derivable :
-    forall a b, convention_eq a b ->
+  Theorem interaction_cannot_witness_collapse :
+    forall a b, collapse a b ->
     forall c, interact a c <> interact b c.
   Proof. intros a b H. exfalso. exact H. Qed.
 
@@ -495,7 +498,7 @@ End SKIComputable.
 (*  INSTANCE-INTERNAL FREEZE                         *)
 (* ================================================ *)
 
-Module SKICT := ComputableExistenceTheory SKIComputable.
+Module SKICT := MaterializedExistenceTheory SKIComputable.
 Import SKIComputable SKICT.
 
 Definition freeze (e : Entity) : Entity := ski_freeze e.

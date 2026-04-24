@@ -220,7 +220,7 @@ Module Construction
   (*                                               *)
   (*  Consequences:                                *)
   (*                                               *)
-  (*  - convention_not_derivable holds vacuously.  *)
+  (*  - interaction_cannot_witness_collapse holds vacuously.  *)
   (*  - Morphisms into the pushout cannot carry    *)
   (*    source conventions — source conventions    *)
   (*    are either identified by the span's       *)
@@ -228,11 +228,11 @@ Module Construction
   (*    the target.                                *)
   (*  - Instances needing target-level convention  *)
   (*    compose Construction with an additional    *)
-  (*    post-quotient that installs convention_eq  *)
+  (*    post-quotient that installs collapse  *)
   (*    explicitly.                                *)
   (* ============================================= *)
 
-  Definition convention_eq (_ _ : Entity) : Prop := False.
+  Definition collapse (_ _ : Entity) : Prop := False.
 
   (* ============================================= *)
   (*  interact_self (PROVED)                       *)
@@ -248,15 +248,15 @@ Module Construction
   Qed.
 
   (* ============================================= *)
-  (*  convention_not_derivable (PROVED, VACUOUS)   *)
+  (*  interaction_cannot_witness_collapse (PROVED, VACUOUS)   *)
   (* ============================================= *)
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall a b : Entity,
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity, interact a c <> interact b c.
   Proof.
-    intros a b Hconv. unfold convention_eq in Hconv. destruct Hconv.
+    intros a b Hconv. unfold collapse in Hconv. destruct Hconv.
   Qed.
 
   (* ============================================= *)

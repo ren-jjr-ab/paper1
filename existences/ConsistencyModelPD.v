@@ -27,7 +27,7 @@
 (*  instead of collapse-to-zero. Together they mark  *)
 (*  two extremes within the ExistenceSig layer.      *)
 (*                                                   *)
-(*  Uses only base ExistenceSig. No Computable       *)
+(*  Uses only base ExistenceSig. No Materialized       *)
 (*  layer needed — the path dependence and K-growth  *)
 (*  witnesses are pure information-preservation      *)
 (*  facts that the base framework can already        *)
@@ -63,13 +63,10 @@ Module ConsistencyModelPDSig <: ExistenceSig.
     intros a. unfold interact. rewrite Nat.eqb_refl. reflexivity.
   Qed.
 
-  Theorem interact_decidable :
-    forall a b c : Entity,
-      {interact a c = interact b c} + {interact a c <> interact b c}.
+  Theorem entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b}.
   Proof.
-    intros a b c.
-    destruct (interact a c) as [x1 y1] eqn:Ea.
-    destruct (interact b c) as [x2 y2] eqn:Eb.
+    intros [x1 y1] [x2 y2].
     destruct (Nat.eq_dec x1 x2) as [Hx | Hx];
       destruct (Nat.eq_dec y1 y2) as [Hy | Hy].
     - left. subst. reflexivity.
@@ -77,6 +74,11 @@ Module ConsistencyModelPDSig <: ExistenceSig.
     - right. intro H. inversion H. contradiction.
     - right. intro H. inversion H. contradiction.
   Qed.
+
+  Theorem interact_decidable :
+    forall a b c : Entity,
+      {interact a c = interact b c} + {interact a c <> interact b c}.
+  Proof. intros. apply entity_eq_dec. Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
   Proof.
@@ -92,12 +94,12 @@ Module ConsistencyModelPDSig <: ExistenceSig.
     rewrite Heqb. intro H. inversion H. lia.
   Qed.
 
-  Definition convention_eq : Entity -> Entity -> Prop :=
+  Definition collapse : Entity -> Entity -> Prop :=
     fun _ _ => False.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall (a b : Entity),
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity,
         interact a c <> interact b c.
   Proof. intros a b H. exfalso. exact H. Qed.

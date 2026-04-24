@@ -29,7 +29,7 @@
 (*     is the framework statement of ℤ = ℕ² / ~.   *)
 (*                                                  *)
 (*  Contrast with the intra-RR / intra-CR case:     *)
-(*  there, external_time advance forced all         *)
+(*  there, witness_time advance forced all         *)
 (*  non-injective preserves_interact morphisms to   *)
 (*  be essentially constant. Here, by using the     *)
 (*  pure-projection regime, we obtain a natural     *)

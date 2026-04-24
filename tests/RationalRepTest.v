@@ -5,10 +5,10 @@
 (*                                                  *)
 (*  1. ExistenceTheory applies — framework's        *)
 (*     derived theorems (dichotomy, observational   *)
-(*     equivalence, convention_eq_irreflexive,      *)
+(*     equivalence, collapse_irreflexive,      *)
 (*     etc.) become available for RationalRep.      *)
 (*                                                  *)
-(*  2. ExternalTimeTheory applies — time advance    *)
+(*  2. WitnessedTheory applies — time advance    *)
 (*     theorems available.                          *)
 (*                                                  *)
 (*  3. The general rational_equivalent_paper_       *)
@@ -19,7 +19,7 @@
 (* ============================================== *)
 
 Require Import Existence.
-Require Import ExternalTime.
+Require Import Witnessed.
 Require Import RationalRep.
 From Stdlib Require Import QArith.
 From Stdlib Require Import ZArith.
@@ -29,17 +29,17 @@ From Stdlib Require Import ZArith.
 (*  1. Framework theory functors apply.                *)
 (* =================================================== *)
 
-Module RR_Theory    := ExistenceTheory     RationalRep_is_ExternalTime.
-Module RR_ExtTime   := ExternalTimeTheory  RationalRep_is_ExternalTime.
+Module RR_Theory    := ExistenceTheory     RationalRep_is_Witnessed.
+Module RR_ExtTime   := WitnessedTheory  RationalRep_is_Witnessed.
 
 (* Check: derived theorems are accessible. *)
 
 Check RR_Theory.is_terminal_impossible.
 Check RR_Theory.viewpoint_has_fixed_point.
-Check RR_Theory.convention_eq_irreflexive.
-Check RR_Theory.observational_equivalence_excludes_convention.
-Check RR_ExtTime.exists_external_time_advancing_partner.
-Check RR_ExtTime.self_interact_preserves_external_time.
+Check RR_Theory.collapse_irreflexive.
+Check RR_Theory.observational_equivalence_excludes_collapse.
+Check RR_ExtTime.exists_witness_time_advancing_partner.
+Check RR_ExtTime.self_interact_preserves_witness_time.
 
 
 (* =================================================== *)

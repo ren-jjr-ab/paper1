@@ -2,7 +2,7 @@
 (*  EpsilonDelta.v                                   *)
 (*                                                   *)
 (*  Classical epsilon-delta convergence embedded     *)
-(*  into the framework as convention_eq.             *)
+(*  into the framework as collapse.             *)
 (*                                                   *)
 (*  Structure:                                       *)
 (*    EDNormal d i sid : partial observation of      *)
@@ -31,7 +31,7 @@
 (*                                                   *)
 (*  Key theorem: if classical_converges sid lid      *)
 (*  holds, the corresponding EDNormal and EDLimit    *)
-(*  entities are connected by convention_eq and      *)
+(*  entities are connected by collapse and      *)
 (*  *not* by any interaction. This is the structural *)
 (*  reading of the paper's thesis — classical        *)
 (*  "lim s = L" is framework ~=, not =.              *)
@@ -43,7 +43,7 @@ From Stdlib Require Import Lia.
 From Stdlib Require Import Eqdep_dec.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 
 (* ================================================ *)
 (*  CLASSICAL CONVERGENCE AS A PARAMETER             *)
@@ -69,7 +69,7 @@ Require Import Computable.
 (*  Every claim in this file that mentions           *)
 (*  `classical_converges` is CONDITIONAL: "if        *)
 (*  `classical_converges sid lid` holds, then        *)
-(*  ... convention_eq ...".                          *)
+(*  ... collapse ...".                          *)
 (*                                                   *)
 (*  Consequence for `Print Assumptions`: any theorem *)
 (*  that transitively depends on this file will     *)
@@ -147,7 +147,7 @@ Definition dim_as_entity (d : nat) : EDEnt := EDLimit d 0 0 0.
 (*  never changes — EDNormal stays EDNormal,         *)
 (*  EDLimit stays EDLimit. This disjointness is      *)
 (*  what forces classical convergence to live at     *)
-(*  the convention_eq layer.                         *)
+(*  the collapse layer.                         *)
 (* ================================================ *)
 
 Definition ed_step (e : EDEnt) (d : nat) : EDEnt :=
@@ -278,7 +278,7 @@ Proof. intros. unfold ed_freeze in H. inversion H. reflexivity. Qed.
 (*  FRAMEWORK INSTANCE                               *)
 (* ================================================ *)
 
-Module EpsilonDeltaComputable <: ComputableExistenceSig.
+Module EpsilonDeltaComputable <: MaterializedExistenceSig.
 
   Definition Entity : Type := EDEnt.
 
@@ -315,10 +315,13 @@ Module EpsilonDeltaComputable <: ComputableExistenceSig.
       left. subst. reflexivity.
   Defined.
 
+  Definition entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b} := ed_eq_dec.
+
   Theorem interact_decidable :
     forall a b c : Entity,
       {interact a c = interact b c} + {interact a c <> interact b c}.
-  Proof. intros. apply ed_eq_dec. Qed.
+  Proof. intros. apply entity_eq_dec. Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
   Proof.
@@ -337,10 +340,10 @@ Module EpsilonDeltaComputable <: ComputableExistenceSig.
     rewrite H in Hd. lia.
   Qed.
 
-  (* convention_eq: classical convergence between a Normal
+  (* collapse: classical convergence between a Normal
      (sequence partial observation) and a Limit. Both orientations
      are accepted. Any other constructor pair is False. *)
-  Definition convention_eq (a b : Entity) : Prop :=
+  Definition collapse (a b : Entity) : Prop :=
     match a, b with
     | EDNormal _ _ sid _ _, EDLimit _ lid _ _ => classical_converges sid lid
     | EDLimit _ lid _ _, EDNormal _ _ sid _ _ => classical_converges sid lid
@@ -350,19 +353,19 @@ Module EpsilonDeltaComputable <: ComputableExistenceSig.
   (* ----------------------------------------------- *)
   (*  THE KEY THEOREM                                *)
   (*                                                 *)
-  (*  convention_not_derivable: if a and b are       *)
-  (*  related by convention_eq (i.e., classical      *)
+  (*  interaction_cannot_witness_collapse: if a and b are       *)
+  (*  related by collapse (i.e., classical      *)
   (*  convergence holds), then no interaction with   *)
   (*  any context c equates them.                    *)
   (*                                                 *)
-  (*  Proof idea: convention_eq only holds between   *)
+  (*  Proof idea: collapse only holds between   *)
   (*  an EDNormal and an EDLimit. The orbit          *)
   (*  separation lemmas show that interaction never  *)
   (*  crosses these two constructors. Done.          *)
   (* ----------------------------------------------- *)
 
-  Theorem convention_not_derivable :
-    forall a b, convention_eq a b ->
+  Theorem interaction_cannot_witness_collapse :
+    forall a b, collapse a b ->
     forall c, interact a c <> interact b c.
   Proof.
     intros a b Hconv c.
@@ -385,7 +388,7 @@ Module EpsilonDeltaComputable <: ComputableExistenceSig.
       rewrite Hna, Hnb in Heq. discriminate.
   Qed.
 
-  (* ---- Computable layer ---- *)
+  (* ---- Materialized layer ---- *)
 
   Definition info_size (e : Entity) : nat := ed_info e.
   Definition storage_cost (e : Entity) : nat := ed_stor e.
@@ -515,7 +518,7 @@ Qed.
 (*  Information is preserved but the limit is never  *)
 (*  reached.                                         *)
 (*                                                   *)
-(*  Strategy 2 — CONVENTION: declare convention_eq   *)
+(*  Strategy 2 — CONVENTION: declare collapse   *)
 (*  between the observation and the limit. The limit *)
 (*  is "reached" by fiat — no interaction derives    *)
 (*  it.                                              *)
@@ -555,7 +558,7 @@ Qed.
 
 Theorem convention_connects_to_limit :
   classical_converges 0 0 ->
-  convention_eq obs_depth3 the_limit.
+  collapse obs_depth3 the_limit.
 Proof. intro H. exact H. Qed.
 
 Theorem convention_not_derived_to_limit :
@@ -564,7 +567,7 @@ Theorem convention_not_derived_to_limit :
     interact obs_depth3 c <> interact the_limit c.
 Proof.
   intros Hconv c.
-  apply (convention_not_derivable obs_depth3 the_limit
+  apply (interaction_cannot_witness_collapse obs_depth3 the_limit
            (convention_connects_to_limit Hconv) c).
 Qed.
 
@@ -578,7 +581,7 @@ Qed.
 (*  sequences or different limits also never agree.  *)
 (*                                                   *)
 (*  Consequence: preserves_at properties cannot      *)
-(*  connect observations to limits. convention_eq    *)
+(*  connect observations to limits. collapse    *)
 (*  is the ONLY bridge.                              *)
 (* ================================================ *)
 
@@ -626,7 +629,7 @@ Qed.
 (* interact_eq_at: never holds between Normal and Limit,
    never holds between Frozen and Limit.
    preserves_at: cannot connect observation to limit.
-   convention_eq: the ONLY bridge between the two orbits.
+   collapse: the ONLY bridge between the two orbits.
 
    freeze: information preserved, limit unreachable.
    convention: limit declared reached, derivation impossible.
@@ -645,10 +648,10 @@ Qed.
 (*    lim_{n -> infty} s(n) = L                      *)
 (*                                                   *)
 (*  is represented in this framework by the relation *)
-(*  convention_eq between a Normal entity (the       *)
+(*  collapse between a Normal entity (the       *)
 (*  partial observation of the sequence) and a Limit *)
 (*  entity (the value L). The theorem                *)
-(*  convention_not_derivable establishes that no     *)
+(*  interaction_cannot_witness_collapse establishes that no     *)
 (*  interaction path connects these two entities,    *)
 (*  regardless of whether classical convergence      *)
 (*  holds — the equality sign in classical math is   *)
@@ -658,7 +661,7 @@ Qed.
 (*                                                   *)
 (*    ==  (Leibniz identity)     — not applicable    *)
 (*    =   (interaction equality) — cannot be shown   *)
-(*    ~=  (convention_eq)        — the actual status *)
+(*    ~=  (collapse)        — the actual status *)
 (*                                                   *)
 (*  Classical analysis writes "=" in all three       *)
 (*  positions. The framework separates them.         *)

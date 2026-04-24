@@ -32,13 +32,13 @@
   *Abstract.*
   An axiom system for existence. The symbol "$=$"
   resolves into three relations — native identity
-  ($equiv$), interaction ($=$), and convention
+  ($equiv$), interaction ($=$), and collapse
   ($approx$) — introduced through three orthogonal
   concerns: *Existence* (entities and their own
-  inherent time), *Computable* (cost structure for
-  real-world systems), and *ExternalTime* (an
+  inherent time), *Materialized* (cost structure
+  for real-world systems), and *Witnessed* (an
   externally imposed time coordinate, parallel to
-  Computable). Each commits to a minimal primitive
+  Materialized). Each commits to a minimal primitive
   vocabulary and a minimal set of axioms. The three
   relations, their separations, and the
   impossibility results that follow are derived
@@ -93,9 +93,9 @@ The three are pairwise disjoint: no pair of entities
 inhabits two of them at once. $equiv$ excludes $=$ by
 distinctness (the interaction case requires $a != b$);
 $equiv$ excludes $approx$ because a reflexive
-convention would demand
+collapse would demand
 $"interact"(a, c) eq.not "interact"(a, c)$, which is
-absurd; and $=$ excludes $approx$ because convention
+absurd; and $=$ excludes $approx$ because collapse
 is axiomatised to block interaction-kernel agreement at
 every viewpoint. Section @sec-relations makes each
 exclusion explicit from the axioms and the formal
@@ -131,12 +131,12 @@ orthogonal concerns:
   own, inherent temporal axis. Every entity carries
   its own time in the form of viewpoints that move
   it; no external clock is assumed.
-- *Computable* — cost structure for real-world
+- *Materialized* — cost structure for real-world
   systems. Interactions consume resources (capacity,
   storage, work); no step is free.
-- *ExternalTime* — an externally imposed time
+- *Witnessed* — an externally imposed time
   coordinate, distinct from the entity's own
-  temporal axis. Parallel to Computable, not
+  temporal axis. Parallel to Materialized, not
   downstream of it.
 
 Each extension inherits Existence's primitives and
@@ -151,7 +151,7 @@ type `ExistenceSig`, theory functor
 the sole object type; `interact` is a binary operation
 that takes an entity and a viewpoint and returns what
 the entity looks like from that viewpoint.
-`convention_eq` is the one relation the framework
+`collapse` is the one relation the framework
 itself names, constrained by a single axiom. The
 remaining two axioms state the framework's existence
 condition: without `existence` and `interact_with`
@@ -169,7 +169,7 @@ dynamic to observe.
     [`Type`],
   [`interact`],
     [`Entity -> Entity -> Entity`],
-  [`convention_eq`],
+  [`collapse`],
     [`Entity -> Entity -> Prop`],
 )
 
@@ -184,10 +184,8 @@ dynamic to observe.
   table.cell(colspan: 2)[_Interaction laws_],
   [`interact_self`],
     [`forall a, interact a a = a`],
-  [`interact_decidable`],
-    [`forall a b c,
-      {interact a c = interact b c} +
-      {interact a c <> interact b c}`],
+  [`entity_eq_dec`],
+    [`forall a b, {a = b} + {a <> b}`],
 
   table.cell(colspan: 2)[_Existence_],
   [`existence`],
@@ -195,9 +193,9 @@ dynamic to observe.
   [`interact_with`],
     [`forall a, exists b, interact a b <> a`],
 
-  table.cell(colspan: 2)[_Convention_],
-  [`convention_not_derivable`],
-    [`forall a b, convention_eq a b ->
+  table.cell(colspan: 2)[_Collapse_],
+  [`interaction_cannot_witness_collapse`],
+    [`forall a b, collapse a b ->
       forall c, interact a c <> interact b c`],
 )
 
@@ -222,40 +220,41 @@ temporal axis: time as a viewpoint inherent to the
 entity, not an external coordinate. No external
 clock is assumed or needed at the Existence layer.
 
-*Decidability.* `interact_decidable` makes the kernel of
-interaction observable: at any common viewpoint, two
-entities' interactions either agree or disagree, and
-we can tell which constructively. This is what
-distinguishes $=$ (interaction, decidable at any
-viewpoint) from $approx$ (convention, not reached by
-any interaction).
+*Decidability.* `entity_eq_dec` makes entity equality
+decidable, and consequently the kernel of interaction
+observable: at any common viewpoint, two entities'
+interactions either agree or disagree, and we can tell
+which constructively (`interact_decidable` is derived
+in the theory functor). This is what distinguishes $=$
+(interaction, decidable at any viewpoint) from
+$approx$ (collapse, not reached by any interaction).
 
-*Convention.* `convention_eq` is a relation an
-instance may assert; `convention_not_derivable` is
+*Collapse.* `collapse` is a relation an
+instance may assert; `interaction_cannot_witness_collapse` is
 the only framework commitment about it — whenever
-two entities are related by convention, some
+two entities are related by collapse, some
 viewpoint must separate them under `interact`. Most
-instances set `convention_eq := False` (no
-conventions); the EpsilonDelta instance is the
-discriminating case, where `convention_eq` carries
+instances set `collapse := False` (no
+collapses); the EpsilonDelta instance is the
+discriminating case, where `collapse` carries
 classical epsilon-delta convergence.
 
 What the axioms leave free: the shape of `Entity`,
 the specific behaviour of `interact` at arbitrary
-pairs (`interact_decidable` only asks that we can tell
-agreement at the kernel, not what the output looks
-like), and whether `convention_eq` is inhabited.
+pairs (`entity_eq_dec` only asks that we can tell
+equality on entities, not what the output looks
+like), and whether `collapse` is inhabited.
 Those choices belong to the instance, not the
 framework.
 
-== Computable
+== Materialized
 
 Real-world systems pay for their interactions.
-Computable is the cost layer — three primitives,
+Materialized is the cost layer — three primitives,
 two axioms.#footnote[Formalised in
-`framework/Computable.v` (module type
-`ComputableExistenceSig`, theory functor
-`ComputableExistenceTheory`).] `info_size` is the
+`framework/Materialized.v` (module type
+`MaterializedExistenceSig`, theory functor
+`MaterializedExistenceTheory`).] `info_size` is the
 capacity of an entity at a moment — the number of
 distinguishable states it carries. Accumulated over
 an interaction chain, cost splits into
@@ -330,17 +329,17 @@ grow, or preserve `info_size`; and the
 identification of `info_size` with any particular
 physical unit. Those are instance commitments.
 
-== ExternalTime
+== Witnessed
 
-ExternalTime introduces a time coordinate that is
+Witnessed introduces a time coordinate that is
 *not* the entity's own — an externally imposed
-counter, parallel to Computable (neither downstream
+counter, parallel to Materialized (neither downstream
 of nor upstream from it), distinct from the internal
 temporal axis Existence already carries via
 `interact_with`. One primitive, one axiom.#footnote[
-Formalised in `framework/ExternalTime.v` (module
-type `ExternalTimeSig`, theory functor
-`ExternalTimeTheory`).] An observer's coordinate
+Formalised in `framework/Witnessed.v` (module
+type `WitnessedSig`, theory functor
+`WitnessedTheory`).] An observer's coordinate
 that strictly advances on every non-identity
 interaction.
 
@@ -351,7 +350,7 @@ interaction.
   inset: 6pt,
   align: (left + top, left + top),
   [*Name*], [*Type*],
-  [`external_time`],
+  [`witness_time`],
     [`Entity -> nat`],
 )
 
@@ -362,33 +361,33 @@ interaction.
   inset: 6pt,
   align: (left + top, left + top),
   [*Name*], [*Statement*],
-  [`external_time_advances_on_nonself`],
+  [`witness_advances_on_nonself`],
     [`forall a c,
       interact a c <> a ->
-      external_time (interact a c)
-        > external_time a`],
+      witness_time (interact a c)
+        > witness_time a`],
 )
 
 Two notes.
 
-*external_time.* A strictly increasing counter.
+*witness_time.* A strictly increasing counter.
 Unlike `info_size` (which an instance may shrink,
-grow, or hold fixed), `external_time` can only hold
+grow, or hold fixed), `witness_time` can only hold
 fixed on self-interactions — otherwise it strictly
 advances.
 
-*Why independent of Computable.* Some instances
+*Why independent of Materialized.* Some instances
 carry a "value coordinate" that can stall under
 interaction — absorbing elements in a semilattice,
 for example, fix themselves. Such instances cannot
 satisfy `interact_with` through the value
-coordinate alone. `external_time` supplies a
+coordinate alone. `witness_time` supplies a
 stall-free coordinate so that every entity has
 some viewpoint moving it, regardless of whether
 the value part moves.
 
 What the axioms leave free: the initial value of
-`external_time`, how fast it advances, and any
+`witness_time`, how fast it advances, and any
 alignment with a physical notion of time. Those
 are instance commitments.
 
@@ -421,8 +420,8 @@ signature level.
   [$=$], [interaction],
     [`a <> b` and
      `exists c, interact a c = interact b c`],
-  [$approx$], [convention],
-    [`convention_eq a b`],
+  [$approx$], [collapse],
+    [`collapse a b`],
 )
 
 Each relation classifies by the kind of witness it
@@ -433,7 +432,7 @@ must exhibit one explicit viewpoint $c$ at which
 the two distinct entities' interactions agree.
 $approx$ is witness-less: the instance commits to
 the equality at the signature level, and
-`convention_not_derivable` rules out
+`interaction_cannot_witness_collapse` rules out
 interaction-kernel agreement at every viewpoint,
 leaving the equality asserted but structurally
 unreachable by any witness within the framework.
@@ -449,9 +448,9 @@ The three exclusions follow directly from the axioms:
   `a <> b`, incompatible with the $equiv$ requirement
   `a = b`.
 
-- $equiv$ excludes $approx$: a reflexive convention
+- $equiv$ excludes $approx$: a reflexive collapse
   would demand `interact a a <> interact a a` via
-  `convention_not_derivable`, contradicting
+  `interaction_cannot_witness_collapse`, contradicting
   `interact_self`.
 
 - $=$ excludes $approx$: $approx$ denies
@@ -480,7 +479,7 @@ some viewpoint agrees, not necessarily all.
 
 - $equiv$ is reflexive; $=$ is irreflexive (by
   `a <> b`); $approx$ is irreflexive.#footnote[
-  `convention_eq_irreflexive` in
+  `collapse_irreflexive` in
   `framework/Existence.v`.]
 
 - $equiv$ is preserved at every viewpoint by
@@ -488,9 +487,9 @@ some viewpoint agrees, not necessarily all.
   `interact a c = interact b c` at every `c`.
 
 - $approx$ is destroyed by every interaction:
-  `convention_eq a b` implies
+  `collapse a b` implies
   `interact a c <> interact b c` at every `c`,
-  by `convention_not_derivable` applied directly.
+  by `interaction_cannot_witness_collapse` applied directly.
 
 The three relations therefore split the equality
 landscape by witness availability. $equiv$ needs
@@ -561,18 +560,18 @@ verification level: $=$ demands a specific $c$ at
 which agreement is decidable, $approx$ declares
 disagreement at every $c$.
 
-*Convention forces distinctness.* Two entities
+*Collapse forces distinctness.* Two entities
 related by $approx$ are distinct under every
 interaction, and in particular as entities.#footnote[
-`convention_eq_distinct`.]
+`collapse_distinct_entities`.]
 
 #align(center)[
-  $"convention_eq"(a, b) space arrow.double space a != b$
+  $"collapse"(a, b) space arrow.double space a != b$
 ]
 
 Applied at the self-viewpoint via
-`convention_not_derivable`, with $b := a$:
-$"convention_eq"(a, a)$ would imply
+`interaction_cannot_witness_collapse`, with $b := a$:
+$"collapse"(a, a)$ would imply
 $"interact"(a, a) != "interact"(a, a)$, contradicting
 `interact_self`. Hence $approx$ is irreflexive — the
 specialisation of distinctness to the diagonal.
@@ -590,17 +589,17 @@ This is the $forall$-dual of $=$'s existential. $"obs"$
 and $approx$ are structurally incompatible: $"obs"$
 asserts universal agreement, $approx$ universal
 disagreement.#footnote[
-`observational_equivalence_excludes_convention`.]
+`observational_equivalence_excludes_collapse`.]
 
 #align(center)[
   $"obs"(a, b) space arrow.double space
-    not "convention_eq"(a, b)$
+    not "collapse"(a, b)$
 ]
 
 Applied at $c := a$: $"obs"(a, b)$ gives
 $"interact"(a, a) = "interact"(b, a)$, i.e.,
 $a = "interact"(b, a)$ by `interact_self`; while
-$"convention_eq"(a, b)$ gives
+$"collapse"(a, b)$ gives
 $"interact"(a, a) != "interact"(b, a)$, i.e.,
 $a != "interact"(b, a)$.
 
@@ -622,11 +621,11 @@ equivalence:
   )
 ]
 
-*Cost is strictly positive.* At the Computable
+*Cost is strictly positive.* At the Materialized
 layer, every non-identity interaction pays a
 nonzero flip cost and never decreases storage
 cost. Formally:#footnote[`both_costs_advance` in
-`framework/Computable.v`.]
+`framework/Materialized.v`.]
 
 #align(center)[
   $"interact"(a, c) != a quad arrow.double quad$
@@ -638,7 +637,7 @@ cost. Formally:#footnote[`both_costs_advance` in
 By `flip_pays_work` (minimum flip per step) and
 `storage_pays_capacity` (storage charged by source
 info size). The strict inequality on flip is the
-Computable-layer statement that *distinguishing
+Materialized-layer statement that *distinguishing
 has positive minimum cost* — no non-identity
 step can be observed for free.
 
@@ -709,8 +708,8 @@ Interaction at `CMark` reduces the rational via `Qred`
 with another `REnt` preserves the source rational
 and advances the time component.
 
-`convention_eq := False`: rationals have no
-convention-level equalities — everything is
+`collapse := False`: rationals have no
+collapse-level equalities — everything is
 resolvable at a viewpoint.
 
 Writing $equiv_QQ$ for Q-value equivalence (the
@@ -737,7 +736,7 @@ viewpoint resolves each through `Qred`, collapsing
 distinct `Q` values with the same reduced form
 into the same canonical representation.
 
-== Cauchy sequences: convention equality via epsilon-delta <sec-cauchy>
+== Cauchy sequences: collapse equality via epsilon-delta <sec-cauchy>
 
 `CauchyReal` realises $approx$ non-trivially. `Entity`
 is either a Cauchy term (a structural sequence
@@ -764,12 +763,12 @@ converge together in the $epsilon$-$delta$ sense:
 The relation _pointwise_distinct_ asks that the
 denoted sequences disagree at every index.
 
-$"convention_eq"$ on `CauchyReal` is
+$"collapse"$ on `CauchyReal` is
 _cauchy_equivalent AND syntactically distinct AND
 pointwise_distinct_. The first is the classical
 limit condition; the second ensures the $approx$
 predicate is meaningful (non-reflexive); the third
-is what `convention_not_derivable` requires.#footnote[
+is what `interaction_cannot_witness_collapse` requires.#footnote[
 `cauchy_pointwise_distinct_convention` in
 `existences/CauchyReal.v`.]
 
@@ -832,13 +831,13 @@ pointwise-distinct at every $n$.#footnote[
 `SemilatticeInstances`)#footnote[
 `existences/LatticeModel.v`,
 `existences/SemilatticeInstances.v`,
-`framework/LatticeExternalTimed.v`.]
+`framework/LatticeWitnessed.v`.]
 realise an instance at the other end: only $equiv$
 is non-trivially inhabited.
 `Entity` is a lattice value paired with a time
 counter; `interact` reduces to the idempotent
 binary operation componentwise;
-`convention_eq := False`.
+`collapse := False`.
 
 Here $=$ reduces to $equiv$ up to the time
 component — no finite witness makes two distinct
@@ -1025,7 +1024,7 @@ carries three distinct relations:
   reflexivity alone;
 - $=$, interaction agreement, verified at a
   specific viewpoint;
-- $approx$, convention, asserted and provably
+- $approx$, collapse, asserted and provably
   unreachable by any interaction.
 
 The framework separates these by committing to a

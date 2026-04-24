@@ -1,5 +1,5 @@
 (* ============================================== *)
-(*  Computable — quantitative extension           *)
+(*  Materialized — quantitative extension         *)
 (*                                                *)
 (*  Extends ExistenceSig with three               *)
 (*  quantitative primitives:                      *)
@@ -24,7 +24,7 @@ From Stdlib Require Import List.
 Import ListNotations.
 From Stdlib Require Import Lia.
 
-Module Type ComputableExistenceSig.
+Module Type MaterializedExistenceSig.
   Include ExistenceSig.
 
   (* ============================================= *)
@@ -69,14 +69,14 @@ Module Type ComputableExistenceSig.
         flip_cost a +
         Nat.max 1 (info_size (interact a c) - info_size a).
 
-End ComputableExistenceSig.
+End MaterializedExistenceSig.
 
 
 (* ============================================== *)
 (*  THEORY FUNCTOR                                *)
 (* ============================================== *)
 
-Module ComputableExistenceTheory (C : ComputableExistenceSig).
+Module MaterializedExistenceTheory (C : MaterializedExistenceSig).
   Module DT := ExistenceTheory C.
   Import C DT.
 
@@ -209,20 +209,20 @@ Module ComputableExistenceTheory (C : ComputableExistenceSig).
       lia.
   Qed.
 
-End ComputableExistenceTheory.
+End MaterializedExistenceTheory.
 
 
 (* ================================================ *)
-(*  COMPUTABLE MORPHISM                              *)
+(*  MATERIALIZED MORPHISM                            *)
 (*                                                   *)
-(*  A morphism between ComputableExistenceSig        *)
+(*  A morphism between MaterializedExistenceSig        *)
 (*  instances that preserves the cost structure.    *)
 (*  Framework-level definitions — instances assert  *)
 (*  these properties against their own cost         *)
 (*  functions.                                      *)
 (* ================================================ *)
 
-Module ComputableMorphism (C1 C2 : ComputableExistenceSig).
+Module MaterializedMorphism (C1 C2 : MaterializedExistenceSig).
 
   Definition preserves_interact (phi : C1.Entity -> C2.Entity) : Prop :=
     forall a b : C1.Entity,
@@ -243,7 +243,7 @@ Module ComputableMorphism (C1 C2 : ComputableExistenceSig).
   (* Full cost-preserving morphism: all three quantitative
      primitives and interact preserved. *)
 
-  Definition computable_morphism (phi : C1.Entity -> C2.Entity) : Prop :=
+  Definition materialized_morphism (phi : C1.Entity -> C2.Entity) : Prop :=
     preserves_interact phi /\
     preserves_info_size phi /\
     preserves_storage_cost phi /\
@@ -251,20 +251,20 @@ Module ComputableMorphism (C1 C2 : ComputableExistenceSig).
 
   (* Convenience projections. *)
 
-  Theorem computable_morphism_preserves_interact :
-    forall phi, computable_morphism phi -> preserves_interact phi.
+  Theorem materialized_morphism_preserves_interact :
+    forall phi, materialized_morphism phi -> preserves_interact phi.
   Proof. intros phi [H _]. exact H. Qed.
 
-  Theorem computable_morphism_preserves_info_size :
-    forall phi, computable_morphism phi -> preserves_info_size phi.
+  Theorem materialized_morphism_preserves_info_size :
+    forall phi, materialized_morphism phi -> preserves_info_size phi.
   Proof. intros phi [_ [H _]]. exact H. Qed.
 
-  Theorem computable_morphism_preserves_storage_cost :
-    forall phi, computable_morphism phi -> preserves_storage_cost phi.
+  Theorem materialized_morphism_preserves_storage_cost :
+    forall phi, materialized_morphism phi -> preserves_storage_cost phi.
   Proof. intros phi [_ [_ [H _]]]. exact H. Qed.
 
-  Theorem computable_morphism_preserves_flip_cost :
-    forall phi, computable_morphism phi -> preserves_flip_cost phi.
+  Theorem materialized_morphism_preserves_flip_cost :
+    forall phi, materialized_morphism phi -> preserves_flip_cost phi.
   Proof. intros phi [_ [_ [_ H]]]. exact H. Qed.
 
   (* Observation: cost-preserving morphisms are rare.
@@ -282,19 +282,19 @@ Module ComputableMorphism (C1 C2 : ComputableExistenceSig).
     forall a : C1.Entity,
       C2.flip_cost (phi a) = C1.flip_cost a + k.
 
-End ComputableMorphism.
+End MaterializedMorphism.
 
 
 (* ================================================ *)
-(*  COMPUTABLE COMPOSITION                           *)
+(*  MATERIALIZED COMPOSITION                         *)
 (*                                                   *)
 (*  Three-instance composition closed under         *)
 (*  cost-preserving morphism class. Each cost       *)
 (*  primitive composes independently.               *)
 (* ================================================ *)
 
-Module ComputableCompose
-  (C1 C2 C3 : ComputableExistenceSig).
+Module MaterializedCompose
+  (C1 C2 C3 : MaterializedExistenceSig).
 
   Definition compose
     (psi : C2.Entity -> C3.Entity)
@@ -345,25 +345,25 @@ Module ComputableCompose
     rewrite Hpsi. apply Hphi.
   Qed.
 
-  (* The full computable-morphism class is closed under
+  (* The full materialized-morphism class is closed under
      composition. Shifted variants compose additively
      (k1 + k2), not proved here to keep scope tight. *)
 
-  Theorem compose_of_computable_morphisms :
+  Theorem compose_of_materialized_morphisms :
     forall psi phi,
-      (* phi is computable C1 → C2 *)
+      (* phi is materialized C1 → C2 *)
       (forall a b,
         phi (C1.interact a b) = C2.interact (phi a) (phi b)) ->
       (forall a, C2.info_size (phi a) = C1.info_size a) ->
       (forall a, C2.storage_cost (phi a) = C1.storage_cost a) ->
       (forall a, C2.flip_cost (phi a) = C1.flip_cost a) ->
-      (* psi is computable C2 → C3 *)
+      (* psi is materialized C2 → C3 *)
       (forall a b,
         psi (C2.interact a b) = C3.interact (psi a) (psi b)) ->
       (forall a, C3.info_size (psi a) = C2.info_size a) ->
       (forall a, C3.storage_cost (psi a) = C2.storage_cost a) ->
       (forall a, C3.flip_cost (psi a) = C2.flip_cost a) ->
-      (* then compose is computable C1 → C3 *)
+      (* then compose is materialized C1 → C3 *)
       (forall a b,
         compose psi phi (C1.interact a b) =
         C3.interact (compose psi phi a) (compose psi phi b)) /\
@@ -379,4 +379,4 @@ Module ComputableCompose
     - apply compose_preserves_flip_cost; assumption.
   Qed.
 
-End ComputableCompose.
+End MaterializedCompose.

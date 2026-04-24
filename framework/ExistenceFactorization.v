@@ -272,21 +272,21 @@ Module Factorization
   (*  faithfully reflects D2's convention          *)
   (*  structure on the image.                      *)
   (*                                               *)
-  (*  convention_not_derivable on the quotient     *)
-  (*  follows from convention_not_derivable on D2  *)
+  (*  interaction_cannot_witness_collapse on the quotient     *)
+  (*  follows from interaction_cannot_witness_collapse on D2  *)
   (*  combined with phi's interact preservation.   *)
   (* ============================================= *)
 
-  Definition convention_eq (x y : Entity) : Prop :=
-    D2.convention_eq (phi_hat x) (phi_hat y).
+  Definition collapse (x y : Entity) : Prop :=
+    D2.collapse (phi_hat x) (phi_hat y).
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall x y : Entity,
-      convention_eq x y ->
+      collapse x y ->
       forall c : Entity, interact x c <> interact y c.
   Proof.
     intros x y Hconv c Heq.
-    unfold convention_eq in Hconv.
+    unfold collapse in Hconv.
     destruct (cls_surjective x) as [u Hu].
     destruct (cls_surjective y) as [v Hv].
     destruct (cls_surjective c) as [w Hw].
@@ -299,7 +299,7 @@ Module Factorization
     unfold ker in Heq.
     rewrite Phi.preserves_interact in Heq.
     rewrite Phi.preserves_interact in Heq.
-    exact (D2.convention_not_derivable
+    exact (D2.interaction_cannot_witness_collapse
              (Phi.phi u) (Phi.phi v) Hconv (Phi.phi w) Heq).
   Qed.
 
@@ -307,8 +307,8 @@ Module Factorization
 
   Theorem phi_hat_preserves_convention :
     forall x y : Entity,
-      convention_eq x y ->
-      D2.convention_eq (phi_hat x) (phi_hat y).
+      collapse x y ->
+      D2.collapse (phi_hat x) (phi_hat y).
   Proof. intros x y H. exact H. Qed.
 
   (* cls preserves convention if Phi does. Source
@@ -316,13 +316,13 @@ Module Factorization
      factoring. *)
 
   Theorem cls_preserves_convention :
-    (forall a b, D1.convention_eq a b ->
-                 D2.convention_eq (Phi.phi a) (Phi.phi b)) ->
-    forall a b, D1.convention_eq a b ->
-               convention_eq (cls a) (cls b).
+    (forall a b, D1.collapse a b ->
+                 D2.collapse (Phi.phi a) (Phi.phi b)) ->
+    forall a b, D1.collapse a b ->
+               collapse (cls a) (cls b).
   Proof.
     intros Hphi_pres a b Hconv.
-    unfold convention_eq.
+    unfold collapse.
     rewrite phi_hat_spec. rewrite phi_hat_spec.
     apply Hphi_pres. exact Hconv.
   Qed.

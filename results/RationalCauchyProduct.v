@@ -4,9 +4,9 @@
 (*  RationalRep × CauchyReal as a joint instance.   *)
 (*                                                  *)
 (*  Product's interact is coordinate-wise.          *)
-(*  Product's convention_eq requires BOTH           *)
+(*  Product's collapse requires BOTH           *)
 (*  coordinates — which is uninhabited here         *)
-(*  because RationalRep.convention_eq is False.     *)
+(*  because RationalRep.collapse is False.     *)
 (*                                                  *)
 (*  Using the morphism phi : RationalRep →          *)
 (*  CauchyReal (from RationalToCauchyMorphism),     *)
@@ -23,7 +23,7 @@
 (*  - Projections recover coordinates.              *)
 (*  - RR's rational paper_projection lifts to       *)
 (*    the product with explicit joint witness.      *)
-(*  - Product convention_eq is uninhabited.         *)
+(*  - Product collapse is uninhabited.         *)
 (* ============================================== *)
 
 Require Existence.
@@ -67,16 +67,16 @@ Compute Prod.interact
 
 
 (* =========================================== *)
-(*  PRODUCT convention_eq IS UNINHABITED       *)
+(*  PRODUCT collapse IS UNINHABITED       *)
 (*                                             *)
-(*  Product.convention_eq requires BOTH        *)
-(*  coordinates to be convention_eq. Since     *)
-(*  RationalRep.convention_eq = False, no      *)
+(*  Product.collapse requires BOTH        *)
+(*  coordinates to be collapse. Since     *)
+(*  RationalRep.collapse = False, no      *)
 (*  product pair satisfies it.                 *)
 (* =========================================== *)
 
 Theorem product_no_convention_eq :
-  forall a b : Prod.Entity, ~ Prod.convention_eq a b.
+  forall a b : Prod.Entity, ~ Prod.collapse a b.
 Proof.
   intros [a1 a2] [b1 b2] [Hconv _]. exact Hconv.
 Qed.

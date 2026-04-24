@@ -1,7 +1,7 @@
 (* ================================================ *)
 (*  LatticeModel.v                                   *)
 (*                                                   *)
-(*  A concrete ComputableExistenceSig instance       *)
+(*  A concrete MaterializedExistenceSig instance       *)
 (*  where gcd-based pair merging makes information   *)
 (*  loss directly visible in info_size,              *)
 (*  storage_cost, and flip_cost. freeze is provided  *)
@@ -44,7 +44,7 @@ From Stdlib Require Import List.
 Import ListNotations.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 
 (* ================================================ *)
 (*  ENTITY                                           *)
@@ -153,7 +153,7 @@ Qed.
 (*  COMPUTABLE EXISTENCE SIGNATURE INSTANCE          *)
 (* ================================================ *)
 
-Module LatticeComputable <: ComputableExistenceSig.
+Module LatticeComputable <: MaterializedExistenceSig.
 
   Definition Entity : Type := LatEnt.
 
@@ -194,10 +194,13 @@ Module LatticeComputable <: ComputableExistenceSig.
       left. subst. reflexivity.
   Defined.
 
+  Definition entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b} := lat_eq_dec.
+
   Theorem interact_decidable :
     forall a b c : Entity,
       {interact a c = interact b c} + {interact a c <> interact b c}.
-  Proof. intros. apply lat_eq_dec. Qed.
+  Proof. intros. apply entity_eq_dec. Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
   Proof.
@@ -216,12 +219,12 @@ Module LatticeComputable <: ComputableExistenceSig.
     rewrite H in Hd. lia.
   Qed.
 
-  Definition convention_eq : Entity -> Entity -> Prop :=
+  Definition collapse : Entity -> Entity -> Prop :=
     fun _ _ => False.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall (a b : Entity),
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity,
         interact a c <> interact b c.
   Proof. intros a b H. exfalso. exact H. Qed.
@@ -287,7 +290,7 @@ End LatticeComputable.
 (*  theorem.                                         *)
 (* ================================================ *)
 
-Module LCT := ComputableExistenceTheory LatticeComputable.
+Module LCT := MaterializedExistenceTheory LatticeComputable.
 Import LatticeComputable LCT.
 
 Definition freeze (e : Entity) : Entity := lat_freeze e.

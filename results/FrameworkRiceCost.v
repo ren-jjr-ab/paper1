@@ -7,7 +7,7 @@
 (*  two distinct non-frozen entities collapse  *)
 (*  onto a common target.                      *)
 (*                                             *)
-(*  This file adds the Computable-layer        *)
+(*  This file adds the Materialized-layer        *)
 (*  statement: collapse is not only            *)
 (*  non-invertible but strictly costly. When   *)
 (*  the collapse is non-trivial on both sides  *)
@@ -32,7 +32,7 @@
 (*                                             *)
 (*  Instances opt in by supplying a collapse   *)
 (*  witness plus two non-identity axioms at    *)
-(*  the Computable layer.                      *)
+(*  the Materialized layer.                      *)
 (* ========================================== *)
 
 From Stdlib Require Import Arith.
@@ -40,13 +40,13 @@ From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 
 (* ================================================ *)
 (*  MODULE TYPE                                      *)
 (*                                                   *)
 (*  Same shape as ExistenceWithCollapse, promoted    *)
-(*  to ComputableExistenceSig, plus two              *)
+(*  to MaterializedExistenceSig, plus two              *)
 (*  non-identity axioms needed to apply              *)
 (*  flip_pays_work constructively. Framework has no  *)
 (*  general entity-equality decider, so the          *)
@@ -54,8 +54,8 @@ Require Import Computable.
 (*  commitment rather than derived.                  *)
 (* ================================================ *)
 
-Module Type ComputableExistenceWithCollapse.
-  Include ComputableExistenceSig.
+Module Type MaterializedExistenceWithCollapse.
+  Include MaterializedExistenceSig.
 
   Parameter is_frozen : Entity -> Prop.
 
@@ -82,18 +82,18 @@ Module Type ComputableExistenceWithCollapse.
   Axiom collapse_nontrivial_a' :
     interact collapse_a' collapse_via <> collapse_a'.
 
-End ComputableExistenceWithCollapse.
+End MaterializedExistenceWithCollapse.
 
 
 (* ================================================ *)
 (*  FUNCTOR                                          *)
 (* ================================================ *)
 
-Module Make (D : ComputableExistenceWithCollapse).
+Module Make (D : MaterializedExistenceWithCollapse).
 
   Import D.
   Module DT := ExistenceTheory D.
-  Module CT := ComputableExistenceTheory D.
+  Module CT := MaterializedExistenceTheory D.
   Import DT CT.
 
   (* ============================================= *)

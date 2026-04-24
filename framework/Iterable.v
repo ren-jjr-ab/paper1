@@ -1,7 +1,7 @@
 (* ============================================== *)
 (*  Iterable — termination structure              *)
 (*                                                *)
-(*  Extends ComputableExistenceSig with one       *)
+(*  Extends MaterializedExistenceSig with one     *)
 (*  primitive:                                    *)
 (*                                                *)
 (*    remaining : Entity -> option nat            *)
@@ -15,15 +15,15 @@
 (* ============================================== *)
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 From Stdlib Require Import Arith.
 From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
 From Stdlib Require Import List.
 Import ListNotations.
 
-Module Type IterableComputableSig.
-  Include ComputableExistenceSig.
+Module Type IterableMaterializedSig.
+  Include MaterializedExistenceSig.
 
   (* ============================================= *)
   (*  NEW PRIMITIVE                                *)
@@ -57,11 +57,11 @@ Module Type IterableComputableSig.
       remaining a = Some 0 ->
       remaining (interact a c) = Some 0.
 
-End IterableComputableSig.
+End IterableMaterializedSig.
 
 
-Module IterableTheory (I : IterableComputableSig).
-  Module CT := ComputableExistenceTheory I.
+Module IterableTheory (I : IterableMaterializedSig).
+  Module CT := MaterializedExistenceTheory I.
   Import I CT.
 
   Lemma done_preserved :
@@ -141,13 +141,13 @@ End IterableTheory.
 (* ================================================ *)
 (*  ITERABLE MORPHISM                                *)
 (*                                                   *)
-(*  A morphism between IterableComputableSig        *)
+(*  A morphism between IterableMaterializedSig        *)
 (*  instances that preserves the termination         *)
 (*  structure — specifically, the remaining         *)
 (*  counter.                                         *)
 (* ================================================ *)
 
-Module IterableMorphism (I1 I2 : IterableComputableSig).
+Module IterableMorphism (I1 I2 : IterableMaterializedSig).
 
   Definition preserves_interact (phi : I1.Entity -> I2.Entity) : Prop :=
     forall a b : I1.Entity,
@@ -192,7 +192,7 @@ End IterableMorphism.
 (*  ITERABLE COMPOSITION                             *)
 (* ================================================ *)
 
-Module IterableCompose (I1 I2 I3 : IterableComputableSig).
+Module IterableCompose (I1 I2 I3 : IterableMaterializedSig).
 
   Definition compose
     (psi : I2.Entity -> I3.Entity)

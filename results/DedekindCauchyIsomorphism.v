@@ -36,7 +36,7 @@
 
 Require Existence.
 Require ExistenceMorphism.
-Require ExternalTime.
+Require Witnessed.
 Require CauchyReal.
 Require DedekindReal.
 From Stdlib Require Import QArith.
@@ -290,10 +290,10 @@ Proof. apply psi_phi_id. Qed.
 (*  CONVENTION_EQ CORRESPONDENCE                     *)
 (*                                                   *)
 (*  Although is_iso alone does not require            *)
-(*  convention preservation, the convention_eq       *)
+(*  convention preservation, the collapse       *)
 (*  structure is parallel across the two instances  *)
 (*  — denote aligns, so cauchy_equivalent /          *)
-(*  pointwise_distinct also align. convention_eq    *)
+(*  pointwise_distinct also align. collapse    *)
 (*  therefore transports both ways.                 *)
 (* ================================================ *)
 
@@ -324,8 +324,8 @@ Qed.
 
 Theorem phi_preserves_convention :
   forall a b : DR.Entity,
-    DR.convention_eq a b ->
-    CR.convention_eq (phi a) (phi b).
+    DR.collapse a b ->
+    CR.collapse (phi a) (phi b).
 Proof.
   intros a b Hconv.
   destruct a as [c1 t1 | n1 t1];

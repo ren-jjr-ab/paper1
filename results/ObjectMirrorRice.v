@@ -44,14 +44,15 @@ Module ObjectMirrorWithCollapse <: FrameworkRice.ExistenceWithCollapse.
 
   Definition Entity        := ObjectMirror.ObjectMirror.Entity.
   Definition interact      := ObjectMirror.ObjectMirror.interact.
-  Definition convention_eq := ObjectMirror.ObjectMirror.convention_eq.
+  Definition collapse := ObjectMirror.ObjectMirror.collapse.
 
   Definition interact_self       := ObjectMirror.ObjectMirror.interact_self.
+  Definition entity_eq_dec       := ObjectMirror.ObjectMirror.entity_eq_dec.
   Definition interact_decidable  := ObjectMirror.ObjectMirror.interact_decidable.
   Definition existence           := ObjectMirror.ObjectMirror.existence.
   Definition interact_with       := ObjectMirror.ObjectMirror.interact_with.
-  Definition convention_not_derivable :=
-    ObjectMirror.ObjectMirror.convention_not_derivable.
+  Definition interaction_cannot_witness_collapse :=
+    ObjectMirror.ObjectMirror.interaction_cannot_witness_collapse.
 
   (* Nothing is frozen in ObjectMirror — freeze is a framework
      concept the instance doesn't carry. *)

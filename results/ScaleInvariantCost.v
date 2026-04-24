@@ -33,14 +33,14 @@ From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 
 (* ================================================ *)
 (*  PART 1: MINIMUM REQUIREMENTS FOR DECISION       *)
 (* ================================================ *)
 
-Module ScaleInvariant (C : ComputableExistenceSig).
-  Module CDT := ComputableExistenceTheory C.
+Module ScaleInvariant (C : MaterializedExistenceSig).
+  Module CDT := MaterializedExistenceTheory C.
   Module DT := ExistenceTheory C.
   Import C CDT DT.
 

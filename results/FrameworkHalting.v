@@ -24,10 +24,10 @@ From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 Require Import Iterable.
 
-Module Make (I : IterableComputableSig).
+Module Make (I : IterableMaterializedSig).
   Import I.
 
   (* ============================================= *)

@@ -293,22 +293,22 @@ Module PullbackUniversal (D1 D2 Base X : ExistenceSig)
   Qed.
 
   (* Convention preservation lifts coordinate-wise into
-     the product, and (since Pullback's convention_eq is
+     the product, and (since Pullback's collapse is
      inherited from the product) into the pullback. *)
 
   Theorem pullback_pair_preserves_convention :
     forall f1 f2,
-      (forall a b, X.convention_eq a b ->
-                   D1.convention_eq (f1 a) (f1 b)) ->
-      (forall a b, X.convention_eq a b ->
-                   D2.convention_eq (f2 a) (f2 b)) ->
+      (forall a b, X.collapse a b ->
+                   D1.collapse (f1 a) (f1 b)) ->
+      (forall a b, X.collapse a b ->
+                   D2.collapse (f2 a) (f2 b)) ->
       forall a b,
-        X.convention_eq a b ->
-        PB.P.convention_eq (pullback_pair f1 f2 a)
+        X.collapse a b ->
+        PB.P.collapse (pullback_pair f1 f2 a)
                            (pullback_pair f1 f2 b).
   Proof.
     intros f1 f2 Hf1 Hf2 a b Hconv.
-    unfold pullback_pair, PB.P.convention_eq. simpl.
+    unfold pullback_pair, PB.P.collapse. simpl.
     split.
     - apply Hf1. exact Hconv.
     - apply Hf2. exact Hconv.

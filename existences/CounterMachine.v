@@ -28,7 +28,7 @@ From Stdlib Require Import Lia.
 From Stdlib Require Import Eqdep_dec.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 Require Import Iterable.
 
 (* ================================================ *)
@@ -134,7 +134,7 @@ Proof. intros a b H. unfold cm_freeze in H. inversion H. reflexivity. Qed.
 (*  INSTANCE                                         *)
 (* ================================================ *)
 
-Module CounterMachine <: IterableComputableSig.
+Module CounterMachine <: IterableMaterializedSig.
 
   Definition Entity : Type := CMEnt.
 
@@ -165,10 +165,13 @@ Module CounterMachine <: IterableComputableSig.
       left. subst. reflexivity.
   Defined.
 
+  Definition entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b} := cm_eq_dec.
+
   Theorem interact_decidable :
     forall a b c : Entity,
       {interact a c = interact b c} + {interact a c <> interact b c}.
-  Proof. intros. apply cm_eq_dec. Qed.
+  Proof. intros. apply entity_eq_dec. Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
   Proof.
@@ -187,15 +190,15 @@ Module CounterMachine <: IterableComputableSig.
     rewrite H in Hd. lia.
   Qed.
 
-  Definition convention_eq : Entity -> Entity -> Prop :=
+  Definition collapse : Entity -> Entity -> Prop :=
     fun _ _ => False.
 
-  Theorem convention_not_derivable :
-    forall a b, convention_eq a b ->
+  Theorem interaction_cannot_witness_collapse :
+    forall a b, collapse a b ->
     forall c, interact a c <> interact b c.
   Proof. intros a b H. exfalso. exact H. Qed.
 
-  (* ---- Computable layer ---- *)
+  (* ---- Materialized layer ---- *)
 
   Definition info_size (e : Entity) : nat := cm_info e.
   Definition storage_cost (e : Entity) : nat := cm_stor e.
@@ -351,7 +354,7 @@ End CounterMachine.
 (*  INSTANCE-INTERNAL FREEZE                         *)
 (* ================================================ *)
 
-Module CMCT := ComputableExistenceTheory CounterMachine.
+Module CMCT := MaterializedExistenceTheory CounterMachine.
 Import CounterMachine CMCT.
 
 Definition freeze (e : Entity) : Entity := cm_freeze e.

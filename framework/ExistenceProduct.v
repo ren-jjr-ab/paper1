@@ -7,7 +7,7 @@
 (*                                             *)
 (*    Entity        := D1.Entity * D2.Entity   *)
 (*    interact      coordinate-wise            *)
-(*    convention_eq both coordinates convention*)
+(*    collapse both coordinates convention*)
 (*                                             *)
 (*  Each of the five ExistenceSig axioms       *)
 (*  discharges from the corresponding D1 / D2  *)
@@ -37,9 +37,9 @@ Module Make (D1 D2 : ExistenceSig) <: ExistenceSig.
   Definition interact (a b : Entity) : Entity :=
     (D1.interact (fst a) (fst b), D2.interact (snd a) (snd b)).
 
-  Definition convention_eq (a b : Entity) : Prop :=
-    D1.convention_eq (fst a) (fst b) /\
-    D2.convention_eq (snd a) (snd b).
+  Definition collapse (a b : Entity) : Prop :=
+    D1.collapse (fst a) (fst b) /\
+    D2.collapse (snd a) (snd b).
 
   (* ============================================= *)
   (*  AXIOMS (all coordinate-wise)                 *)
@@ -52,20 +52,16 @@ Module Make (D1 D2 : ExistenceSig) <: ExistenceSig.
     reflexivity.
   Qed.
 
-  Theorem interact_decidable :
-    forall a b c : Entity,
-      {interact a c = interact b c} + {interact a c <> interact b c}.
+  Theorem entity_eq_dec :
+    forall a b : Entity, {a = b} + {a <> b}.
   Proof.
-    intros [a1 a2] [b1 b2] [c1 c2]. unfold interact. simpl.
-    destruct (D1.interact_decidable a1 b1 c1) as [H1 | H1];
-    destruct (D2.interact_decidable a2 b2 c2) as [H2 | H2].
-    - left. rewrite H1. rewrite H2. reflexivity.
-    - right. intros Heq.
-      apply (f_equal snd) in Heq. simpl in Heq. exact (H2 Heq).
-    - right. intros Heq.
-      apply (f_equal fst) in Heq. simpl in Heq. exact (H1 Heq).
-    - right. intros Heq.
-      apply (f_equal fst) in Heq. simpl in Heq. exact (H1 Heq).
+    intros [a1 a2] [b1 b2].
+    destruct (D1.entity_eq_dec a1 b1) as [H1 | H1];
+    destruct (D2.entity_eq_dec a2 b2) as [H2 | H2].
+    - left. subst. reflexivity.
+    - right. intros Heq. apply (f_equal snd) in Heq. simpl in Heq. exact (H2 Heq).
+    - right. intros Heq. apply (f_equal fst) in Heq. simpl in Heq. exact (H1 Heq).
+    - right. intros Heq. apply (f_equal fst) in Heq. simpl in Heq. exact (H1 Heq).
   Qed.
 
   Theorem existence : exists a b : Entity, a <> b.
@@ -87,16 +83,16 @@ Module Make (D1 D2 : ExistenceSig) <: ExistenceSig.
     apply (f_equal fst) in Heq. simpl in Heq. exact (Hne Heq).
   Qed.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall a b : Entity,
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity, interact a c <> interact b c.
   Proof.
     intros [a1 a2] [b1 b2] [Hconv1 _] [c1 c2].
     unfold interact. simpl.
     intros Heq.
     apply (f_equal fst) in Heq. simpl in Heq.
-    exact (D1.convention_not_derivable a1 b1 Hconv1 c1 Heq).
+    exact (D1.interaction_cannot_witness_collapse a1 b1 Hconv1 c1 Heq).
   Qed.
 
 End Make.
@@ -126,7 +122,7 @@ Module Projections (D1 D2 : ExistenceSig).
   Qed.
 
   (* Convention preservation for projections: product's
-     convention_eq is a conjunction, so each projection
+     collapse is a conjunction, so each projection
      extracts one conjunct automatically. *)
 
   Theorem pi1_preserves_convention : M1.preserves_convention pi1.
@@ -204,7 +200,7 @@ Module UniversalPair (D D1 D2 : ExistenceSig).
       M.preserves_convention (pair_morphism phi1 phi2).
   Proof.
     intros phi1 phi2 Hphi1 Hphi2 a b Hconv.
-    unfold pair_morphism, P.convention_eq. simpl.
+    unfold pair_morphism, P.collapse. simpl.
     split.
     - apply Hphi1. exact Hconv.
     - apply Hphi2. exact Hconv.

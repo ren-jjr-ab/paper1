@@ -25,7 +25,7 @@
 
 Require Existence.
 Require ExistenceMorphism.
-Require ExternalTime.
+Require Witnessed.
 Require RationalRep.
 Require CauchyReal.
 Require DedekindReal.

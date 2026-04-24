@@ -12,7 +12,7 @@
 (*        so markers can still distinguish          *)
 (*        convention-equal REnt pairs.              *)
 (*                                                  *)
-(*    2.  convention_eq is defined on REnt pairs   *)
+(*    2.  collapse is defined on REnt pairs   *)
 (*        from an external predicate `conv`         *)
 (*        required to be distinct and to avoid     *)
 (*        relating the zero element (otherwise the *)
@@ -25,8 +25,8 @@
 (*                                                  *)
 (*        7 ≡ 14 (mod 7), 14 ≡ 21 (mod 7), …       *)
 (*                                                  *)
-(*  as the framework relation ≈ (convention_eq),   *)
-(*  with `convention_not_derivable` proved.         *)
+(*  as the framework relation ≈ (collapse),   *)
+(*  with `interaction_cannot_witness_collapse` proved.         *)
 (* ============================================== *)
 
 Require Import Existence.
@@ -115,7 +115,7 @@ Module RingAsEntity_WithConv
         end
     end.
 
-  Definition convention_eq (a b : Entity) : Prop :=
+  Definition collapse (a b : Entity) : Prop :=
     match a, b with
     | REnt x, REnt y => CS.conv x y
     | _, _           => False
@@ -167,9 +167,9 @@ Module RingAsEntity_WithConv
         lia.
   Qed.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall a b : Entity,
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity, interact a c <> interact b c.
   Proof.
     intros [x | mx] [y | my] Hconv c;
@@ -263,43 +263,43 @@ Module IntegerMod7Entity :=
 (*                                              *)
 (*  Classical mod-7 equalities between non-zero *)
 (*  integer representatives now inhabit         *)
-(*  framework convention_eq.                    *)
+(*  framework collapse.                    *)
 (* =========================================== *)
 
 Example seven_approx_fourteen :
-  IntegerMod7Entity.convention_eq
+  IntegerMod7Entity.collapse
     (IntegerMod7Entity.REnt 7%Z) (IntegerMod7Entity.REnt 14%Z).
 Proof.
-  unfold IntegerMod7Entity.convention_eq, IntegerMod7Conv.conv.
+  unfold IntegerMod7Entity.collapse, IntegerMod7Conv.conv.
   repeat split; try discriminate.
   exists (-1)%Z. reflexivity.
 Qed.
 
 Example fourteen_approx_twentyone :
-  IntegerMod7Entity.convention_eq
+  IntegerMod7Entity.collapse
     (IntegerMod7Entity.REnt 14%Z) (IntegerMod7Entity.REnt 21%Z).
 Proof.
-  unfold IntegerMod7Entity.convention_eq, IntegerMod7Conv.conv.
+  unfold IntegerMod7Entity.collapse, IntegerMod7Conv.conv.
   repeat split; try discriminate.
   exists (-1)%Z. reflexivity.
 Qed.
 
 Example nine_approx_two :
-  IntegerMod7Entity.convention_eq
+  IntegerMod7Entity.collapse
     (IntegerMod7Entity.REnt 9%Z) (IntegerMod7Entity.REnt 2%Z).
 Proof.
-  unfold IntegerMod7Entity.convention_eq, IntegerMod7Conv.conv.
+  unfold IntegerMod7Entity.collapse, IntegerMod7Conv.conv.
   repeat split; try discriminate.
   exists 1%Z. reflexivity.
 Qed.
 
-(* convention_eq is irreflexive via conv_distinct. *)
+(* collapse is irreflexive via conv_distinct. *)
 
 Example seven_not_approx_seven :
-  ~ IntegerMod7Entity.convention_eq
+  ~ IntegerMod7Entity.collapse
       (IntegerMod7Entity.REnt 7%Z) (IntegerMod7Entity.REnt 7%Z).
 Proof.
-  unfold IntegerMod7Entity.convention_eq, IntegerMod7Conv.conv.
+  unfold IntegerMod7Entity.collapse, IntegerMod7Conv.conv.
   intros [_ [_ [H _]]]. apply H. reflexivity.
 Qed.
 
@@ -318,7 +318,7 @@ Example seven_fourteen_no_witness :
     IntegerMod7Entity.interact (IntegerMod7Entity.REnt 7%Z) c
     <> IntegerMod7Entity.interact (IntegerMod7Entity.REnt 14%Z) c.
 Proof.
-  apply IntegerMod7Entity.convention_not_derivable.
+  apply IntegerMod7Entity.interaction_cannot_witness_collapse.
   apply seven_approx_fourteen.
 Qed.
 
@@ -327,7 +327,7 @@ Qed.
 (*  REMARK                                      *)
 (*                                              *)
 (*  The ≈ layer was empty in the default        *)
-(*  RingAsEntity (convention_eq = False). By    *)
+(*  RingAsEntity (collapse = False). By    *)
 (*  supplying an ideal-based convention and a   *)
 (*  non-zero witness, the layer becomes         *)
 (*  inhabited and the classical mod-n           *)
@@ -340,7 +340,7 @@ Qed.
 (*  REnt-viewpoint c collapses to c via add, so *)
 (*  a convention relating 0 to anything would   *)
 (*  produce witness-agreement at that single    *)
-(*  viewpoint and fail convention_not_derivable.*)
+(*  viewpoint and fail interaction_cannot_witness_collapse.*)
 (*  The non-zero restriction is exactly the     *)
 (*  cut the framework axioms demand.            *)
 (* =========================================== *)

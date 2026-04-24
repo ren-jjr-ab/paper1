@@ -22,7 +22,7 @@
 (*    Mark–Mark : nat successor-max on distinct,    *)
 (*                self on diagonal.                 *)
 (*                                                  *)
-(*  convention_eq := False. The functor supplies    *)
+(*  collapse := False. The functor supplies    *)
 (*  only the ≡ and = layers by default; ≈ is left   *)
 (*  to optional convention extensions (ideal,       *)
 (*  morphism kernel) built on top.                  *)
@@ -97,7 +97,7 @@ Module RingAsEntity (R : DecEqCommRingSig) <: ExistenceSig.
         end
     end.
 
-  Definition convention_eq (_ _ : Entity) : Prop := False.
+  Definition collapse (_ _ : Entity) : Prop := False.
 
 
   (* ------------------------------------------- *)
@@ -141,9 +141,9 @@ Module RingAsEntity (R : DecEqCommRingSig) <: ExistenceSig.
         lia.
   Qed.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall a b : Entity,
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity, interact a c <> interact b c.
   Proof. intros a b []. Qed.
 

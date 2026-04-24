@@ -4,7 +4,7 @@
 (*  Interaction induces a reachability         *)
 (*  relation on entities: b is reachable from  *)
 (*  a when some chain of non-identity          *)
-(*  interactions takes a to b. The Computable  *)
+(*  interactions takes a to b. The Materialized  *)
 (*  layer's flip_pays_work axiom makes every   *)
 (*  such step strictly advance flip_cost.      *)
 (*  Chaining the advances forces flip_cost to  *)
@@ -32,13 +32,13 @@ From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 
-Module Make (C : ComputableExistenceSig).
+Module Make (C : MaterializedExistenceSig).
 
   Import C.
   Module DT := ExistenceTheory C.
-  Module CT := ComputableExistenceTheory C.
+  Module CT := MaterializedExistenceTheory C.
   Import DT CT.
 
   (* ============================================= *)

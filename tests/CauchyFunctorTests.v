@@ -139,7 +139,7 @@ Proof.
   reflexivity.
 Qed.
 
-(* Zero and invsucc (the natural convention_eq pair
+(* Zero and invsucc (the natural collapse pair
    at the paper level) collapse in the Coequalizer. *)
 
 Theorem cauchy_cls_zero_eq_invsucc :

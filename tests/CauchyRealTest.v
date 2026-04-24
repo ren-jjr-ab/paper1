@@ -3,20 +3,20 @@
 (*                                                  *)
 (*  Verify both equalities are live in CauchyReal:  *)
 (*                                                  *)
-(*  1. Functors (ExistenceTheory, ExternalTime      *)
+(*  1. Functors (ExistenceTheory, Witnessed      *)
 (*     Theory) apply.                               *)
 (*                                                  *)
 (*  2. = case (paper_projection) — pointwise        *)
 (*     equal, syntactically distinct terms          *)
 (*     collapse at CEval.                           *)
 (*                                                  *)
-(*  3. ≈ case (convention_eq) — cauchy-equivalent   *)
+(*  3. ≈ case (collapse) — cauchy-equivalent   *)
 (*     pointwise-distinct pair with concrete        *)
 (*     ε-δ proof, no external axioms.               *)
 (* ============================================== *)
 
 Require Import Existence.
-Require Import ExternalTime.
+Require Import Witnessed.
 Require Import CauchyReal.
 From Stdlib Require Import QArith.
 From Stdlib Require Import Qabs.
@@ -27,13 +27,13 @@ From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
 
 
-Module CR_Theory  := ExistenceTheory     CauchyReal_is_ExternalTime.
-Module CR_ExtTime := ExternalTimeTheory  CauchyReal_is_ExternalTime.
+Module CR_Theory  := ExistenceTheory     CauchyReal_is_Witnessed.
+Module CR_ExtTime := WitnessedTheory  CauchyReal_is_Witnessed.
 
 Check CR_Theory.is_terminal_impossible.
-Check CR_Theory.convention_eq_irreflexive.
-Check CR_Theory.observational_equivalence_excludes_convention.
-Check CR_ExtTime.exists_external_time_advancing_partner.
+Check CR_Theory.collapse_irreflexive.
+Check CR_Theory.observational_equivalence_excludes_collapse.
+Check CR_ExtTime.exists_witness_time_advancing_partner.
 
 
 (* ===================================================== *)
@@ -149,7 +149,7 @@ Proof.
 Qed.
 
 Theorem const_sum_convention_eq :
-  CauchyReal.convention_eq
+  CauchyReal.collapse
     (CauchyReal.REnt const_1 0%nat)
     (CauchyReal.REnt one_plus_invsucc 0%nat).
 Proof.
@@ -166,6 +166,6 @@ Theorem const_sum_no_viewpoint_bridges :
     CauchyReal.interact (CauchyReal.REnt const_1 0%nat) c <>
     CauchyReal.interact (CauchyReal.REnt one_plus_invsucc 0%nat) c.
 Proof.
-  apply CauchyReal.convention_not_derivable.
+  apply CauchyReal.interaction_cannot_witness_collapse.
   exact const_sum_convention_eq.
 Qed.

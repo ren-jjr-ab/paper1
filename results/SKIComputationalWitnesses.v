@@ -28,7 +28,7 @@
 (* ================================================ *)
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 Require Import Iterable.
 Require SKIModel.
 Require FrameworkRice.
@@ -72,14 +72,15 @@ Module SKIExistenceWithCollapse <: FrameworkRice.ExistenceWithCollapse.
 
   Definition Entity           := SKIModel.SKIComputable.Entity.
   Definition interact         := SKIModel.SKIComputable.interact.
-  Definition convention_eq    := SKIModel.SKIComputable.convention_eq.
+  Definition collapse    := SKIModel.SKIComputable.collapse.
 
   Definition interact_self    := SKIModel.SKIComputable.interact_self.
+  Definition entity_eq_dec    := SKIModel.SKIComputable.entity_eq_dec.
   Definition interact_decidable := SKIModel.SKIComputable.interact_decidable.
   Definition existence        := SKIModel.SKIComputable.existence.
   Definition interact_with    := SKIModel.SKIComputable.interact_with.
-  Definition convention_not_derivable :=
-    SKIModel.SKIComputable.convention_not_derivable.
+  Definition interaction_cannot_witness_collapse :=
+    SKIModel.SKIComputable.interaction_cannot_witness_collapse.
 
   Definition is_frozen (e : Entity) : Prop :=
     exists d s f inner, e = SKIModel.SKIFrozen d s f inner.

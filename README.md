@@ -1,7 +1,7 @@
 # Existence is difference
 
 An axiom system that separates the single symbol `=` into three relations:
-`≡` (native identity), `=` (interaction), `≈` (convention). Mechanically
+`≡` (native identity), `=` (interaction), `≈` (collapse). Mechanically
 verified in Coq, with zero `Admitted`.
 
 - **Paper:** [`paper.typ`](./paper.typ) / `paper.pdf` — core theory, ~12 pages.
@@ -29,10 +29,10 @@ Three primitives and five axioms generate everything downstream. See
 | --- | --- |
 | `Entity : Type` | the sole object type |
 | `interact : Entity → Entity → Entity` | binary operation |
-| `convention_eq : Entity → Entity → Prop` | the one named relation |
+| `collapse : Entity → Entity → Prop` | the one named relation |
 
-Axioms: `interact_self`, `interact_decidable`, `existence`, `interact_with`,
-`convention_not_derivable`.
+Axioms: `interact_self`, `entity_eq_dec`, `existence`, `interact_with`,
+`interaction_cannot_witness_collapse`.
 
 Every algebraic, set-theoretic, computational, and numeric structure in
 `existences/` either directly satisfies `ExistenceSig` or is lifted into
@@ -51,12 +51,13 @@ promotes that act of inspection (`interact`) to the first primitive.
 The five axioms are statements about the *shape of observation*:
 
 - `interact_self` — self-observation returns the entity unchanged.
-- `interact_decidable` — observation agreement is decidable.
+- `entity_eq_dec` — entity equality is decidable (and hence
+  observation agreement is decidable via `interact_decidable`).
 - `existence` — at least two entities exist to observe.
 - `interact_with` — every entity has a viewpoint that moves it
   (no terminal state).
-- `convention_not_derivable` — `≈` marks what no observation can
-  witness.
+- `interaction_cannot_witness_collapse` — `≈` marks what no
+  observation can witness.
 
 The mechanisation's scale (~22k lines) is the visible cost of paying
 for observation explicitly where other axiomatisations inherit it
@@ -75,10 +76,10 @@ Primitives, composition operators, and external algebraic interfaces.
 ### Foundation
 
 - `Existence.v` — 3 primitives + 5 axioms + `ExistenceTheory` (core).
-- `Computable.v` — cost layer: `info_size`, `storage_cost`, `flip_cost`.
-- `ExternalTime.v` — external time coordinate, parallel to cost.
+- `Materialized.v` — cost layer: `info_size`, `storage_cost`, `flip_cost`.
+- `Witnessed.v` — witness time coordinate, parallel to cost.
 - `Iterable.v` — `remaining` primitive (stall-free progress).
-- `LatticeExternalTimed.v` — lattice value + external time composition.
+- `LatticeWitnessed.v` — lattice value + witness time composition.
 
 ### Categorical composition (over `ExistenceSig`)
 
@@ -113,7 +114,7 @@ or `DecEqCommRingSig`.
 - `PolyModel.v` — polynomial model (Existence-level).
 - `RealIterator.v` — iterator over a real sequence.
 - `SKIModel.v` — SKI combinator calculus.
-- `EpsilonDelta.v` — ε–δ convergence witness for convention_eq.
+- `EpsilonDelta.v` — ε–δ convergence witness for collapse.
 - `SemilatticeInstances.v` — concrete semilattices.
 - `PureMarkerEntity.v` — degenerate instance: `Entity = nat`, pure
   viewpoints without data. The minimal inhabitant of `ExistenceSig`.
@@ -154,7 +155,7 @@ or `DecEqCommRingSig`.
   Instantiations across ℤ, ℤ/7ℤ, FinSet3, ℤ[x], and the edge cases
   F₂ and the trivial ring.
 - `RingAsEntity_WithConv.v` — same construction with a non-trivial
-  `convention_eq`. The running instance is ℤ with the mod-7 relation
+  `collapse`. The running instance is ℤ with the mod-7 relation
   between non-zero representatives, realising classical `7 ≡ 14 (mod 7)`
   as framework `≈`.
 

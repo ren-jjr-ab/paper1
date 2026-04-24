@@ -16,7 +16,7 @@
 (* ================================================ *)
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 Require Import FrameworkRiceCost.
 Require Import LatticeModel.
 
@@ -24,7 +24,7 @@ From Stdlib Require Import Lia.
 From Stdlib Require Import List.
 Import ListNotations.
 
-Module LatticeWithCollapseComputable <: ComputableExistenceWithCollapse.
+Module LatticeWithCollapseComputable <: MaterializedExistenceWithCollapse.
   Include LatticeComputable.
 
   Definition is_frozen (a : Entity) : Prop :=

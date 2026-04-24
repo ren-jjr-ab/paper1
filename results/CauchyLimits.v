@@ -250,7 +250,7 @@ Qed.
 (* =========================================== *)
 
 Theorem invsucc_squared_convention_eq_zero :
-  CR.convention_eq
+  CR.collapse
     (CR.REnt (CR.CTMul CR.CTInvSucc CR.CTInvSucc) 0%nat)
     (CR.REnt (CR.CTConst 0) 0%nat).
 Proof.
@@ -316,7 +316,7 @@ Proof. intros x y z n. cbn [CR.denote]. ring. Qed.
 (*  Pointwise-equal implies cauchy_equivalent  *)
 (*  trivially. Algebraic edge cases survive    *)
 (*  as paper_projection (via CEval) but never  *)
-(*  as convention_eq (≈ requires pointwise_    *)
+(*  as collapse (≈ requires pointwise_    *)
 (*  DIS-tinct).                                *)
 (* =========================================== *)
 
@@ -336,13 +336,13 @@ Proof.
   apply sum_neg_pointwise.
 Qed.
 
-(* Algebraic identities CANNOT be convention_eq:
+(* Algebraic identities CANNOT be collapse:
    pointwise_equal means they AGREE at every n,
    contradicting pointwise_distinct. *)
 
 Example double_neg_not_convention :
   forall x : CR.CauchyTerm, forall t1 t2 : nat,
-    ~ CR.convention_eq
+    ~ CR.collapse
         (CR.REnt (CR.CTNeg (CR.CTNeg x)) t1)
         (CR.REnt x t2).
 Proof.

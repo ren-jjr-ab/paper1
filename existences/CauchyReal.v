@@ -3,7 +3,7 @@
 (*                                                  *)
 (*  Cauchy sequences over Q as framework entities,  *)
 (*  carrying BOTH = (paper_projection) and ≈        *)
-(*  (convention_eq) equalities in one instance.     *)
+(*  (collapse) equalities in one instance.     *)
 (*                                                  *)
 (*  - ≡ : syntactic identity on CauchyTerm.         *)
 (*  - = : pointwise-equal (valuewise at every       *)
@@ -13,7 +13,7 @@
 (*  - ≈ : cauchy-equivalent (same real limit via    *)
 (*        ε-δ) but pointwise-distinct at every      *)
 (*        index — no finite viewpoint can witness   *)
-(*        agreement. convention_eq pays the         *)
+(*        agreement. collapse pays the         *)
 (*        unsound/incomplete cost to declare equal  *)
 (*        what time's flow cannot.                  *)
 (*                                                  *)
@@ -42,7 +42,7 @@
 (* ============================================== *)
 
 Require Import Existence.
-Require Import ExternalTime.
+Require Import Witnessed.
 From Stdlib Require Import QArith.
 From Stdlib Require Import Qabs.
 From Stdlib Require Import ZArith.
@@ -194,7 +194,7 @@ Module CauchyReal.
         end
     end.
 
-  Definition convention_eq (a b : Entity) : Prop :=
+  Definition collapse (a b : Entity) : Prop :=
     match a, b with
     | REnt s1 _, REnt s2 _ =>
         s1 <> s2 /\
@@ -203,7 +203,7 @@ Module CauchyReal.
     | _, _ => False
     end.
 
-  Definition external_time (a : Entity) : nat := tm_of a.
+  Definition witness_time (a : Entity) : nat := tm_of a.
 
   (* =========================================== *)
   (*  AXIOM PROOFS                               *)
@@ -269,9 +269,9 @@ Module CauchyReal.
     rewrite H. reflexivity.
   Qed.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall a b : Entity,
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity, interact a c <> interact b c.
   Proof.
     intros a b Hconv c.
@@ -299,16 +299,16 @@ Module CauchyReal.
         exact Hq.
   Qed.
 
-  Theorem external_time_advances_on_nonself :
+  Theorem witness_advances_on_nonself :
     forall a c : Entity,
       interact a c <> a ->
-      (external_time (interact a c) > external_time a)%nat.
+      (witness_time (interact a c) > witness_time a)%nat.
   Proof.
     intros a c Hne.
     unfold interact in Hne. unfold interact.
     destruct (entity_eq_dec a c) as [_ | _].
     - exfalso. apply Hne. reflexivity.
-    - unfold external_time.
+    - unfold witness_time.
       destruct a as [sa ta | na ta]; destruct c as [sc tc | nc tc]; simpl; lia.
   Qed.
 
@@ -346,7 +346,7 @@ Module CauchyReal.
   (*  GENERAL CONVENTION (≈) THEOREM             *)
   (*                                             *)
   (*  cauchy_equivalent + pointwise_distinct +   *)
-  (*  syntactic distinctness → convention_eq.    *)
+  (*  syntactic distinctness → collapse.    *)
   (* =========================================== *)
 
   Theorem cauchy_pointwise_distinct_convention :
@@ -354,7 +354,7 @@ Module CauchyReal.
       s1 <> s2 ->
       cauchy_equivalent s1 s2 ->
       pointwise_distinct s1 s2 ->
-      convention_eq (REnt s1 t1) (REnt s2 t2).
+      collapse (REnt s1 t1) (REnt s2 t2).
   Proof.
     intros. simpl. repeat split; assumption.
   Qed.
@@ -363,4 +363,4 @@ End CauchyReal.
 
 
 (* Signature check. *)
-Module CauchyReal_is_ExternalTime : ExternalTimeSig := CauchyReal.
+Module CauchyReal_is_Witnessed : WitnessedSig := CauchyReal.

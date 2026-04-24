@@ -33,7 +33,7 @@
 (* ============================================== *)
 
 Require Import Existence.
-Require Import ExternalTime.
+Require Import Witnessed.
 From Stdlib Require Import QArith.
 From Stdlib Require Import Qabs.
 From Stdlib Require Import ZArith.
@@ -176,7 +176,7 @@ Module DedekindReal.
         end
     end.
 
-  Definition convention_eq (a b : Entity) : Prop :=
+  Definition collapse (a b : Entity) : Prop :=
     match a, b with
     | DREnt c1 _, DREnt c2 _ =>
         c1 <> c2 /\
@@ -185,7 +185,7 @@ Module DedekindReal.
     | _, _ => False
     end.
 
-  Definition external_time (a : Entity) : nat := tm_of a.
+  Definition witness_time (a : Entity) : nat := tm_of a.
 
   (* =========================================== *)
   (*  AXIOM PROOFS                               *)
@@ -235,9 +235,9 @@ Module DedekindReal.
     rewrite H. reflexivity.
   Qed.
 
-  Theorem convention_not_derivable :
+  Theorem interaction_cannot_witness_collapse :
     forall a b : Entity,
-      convention_eq a b ->
+      collapse a b ->
       forall c : Entity, interact a c <> interact b c.
   Proof.
     intros a b Hconv c.
@@ -259,16 +259,16 @@ Module DedekindReal.
         exact Hq.
   Qed.
 
-  Theorem external_time_advances_on_nonself :
+  Theorem witness_advances_on_nonself :
     forall a c : Entity,
       interact a c <> a ->
-      (external_time (interact a c) > external_time a)%nat.
+      (witness_time (interact a c) > witness_time a)%nat.
   Proof.
     intros a c Hne.
     unfold interact in Hne. unfold interact.
     destruct (entity_eq_dec a c) as [_ | _].
     - exfalso. apply Hne. reflexivity.
-    - unfold external_time.
+    - unfold witness_time.
       destruct a as [ca ta | na ta]; destruct c as [cc tc | nc tc]; simpl; lia.
   Qed.
 
@@ -276,4 +276,4 @@ End DedekindReal.
 
 
 (* Signature check. *)
-Module DedekindReal_is_ExternalTime : ExternalTimeSig := DedekindReal.
+Module DedekindReal_is_Witnessed : WitnessedSig := DedekindReal.

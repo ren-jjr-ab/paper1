@@ -10,10 +10,10 @@
 # ============================================================
 
 framework/Existence.v
-framework/Computable.v
+framework/Materialized.v
 framework/Iterable.v
-framework/ExternalTime.v
-framework/LatticeExternalTimed.v
+framework/Witnessed.v
+framework/LatticeWitnessed.v
 framework/ExistenceMorphism.v
 framework/ExistenceProduct.v
 framework/ExistencePullback.v

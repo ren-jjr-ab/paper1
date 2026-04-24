@@ -61,7 +61,7 @@ Module Make (D : ExistenceSig).
     a <> b.
 
   Definition paper_convention (a b : Entity) : Prop :=
-    convention_eq a b.
+    collapse a b.
 
   (* ================================================ *)
   (*  PAIRWISE DISJOINTNESS                           *)
@@ -80,7 +80,7 @@ Module Make (D : ExistenceSig).
     intros a b [Heq Hconv].
     unfold paper_equiv in Heq. subst b.
     unfold paper_convention in Hconv.
-    apply (convention_not_derivable a a Hconv a).
+    apply (interaction_cannot_witness_collapse a a Hconv a).
     reflexivity.
   Qed.
 
@@ -89,7 +89,7 @@ Module Make (D : ExistenceSig).
   Proof.
     intros a b [[[c Hpeq] _] Hconv].
     unfold paper_convention in Hconv.
-    exact (convention_not_derivable a b Hconv c Hpeq).
+    exact (interaction_cannot_witness_collapse a b Hconv c Hpeq).
   Qed.
 
   Theorem paper_trichotomy_pairwise_disjoint :
@@ -135,7 +135,7 @@ Module Make (D : ExistenceSig).
   Proof.
     intros a b c Hconv.
     unfold paper_convention in Hconv.
-    exact (convention_not_derivable a b Hconv c).
+    exact (interaction_cannot_witness_collapse a b Hconv c).
   Qed.
 
   (* Reflexive / irreflexive witnesses — ≡ holds at

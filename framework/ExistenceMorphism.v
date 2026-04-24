@@ -5,9 +5,9 @@
 (*                                             *)
 (*  A morphism preserves the primary           *)
 (*  primitive — interact — and nothing more.   *)
-(*  convention_eq is secondary in the          *)
+(*  collapse is secondary in the          *)
 (*  framework (four axioms govern interact;    *)
-(*  one relative axiom ties convention_eq to   *)
+(*  one relative axiom ties collapse to   *)
 (*  interact), and the morphism definition     *)
 (*  reflects that asymmetry. Convention        *)
 (*  handling is layered on top as optional     *)
@@ -28,7 +28,7 @@
 (*       survives in the target.               *)
 (*                                             *)
 (*    3. Injective morphisms REFLECT target    *)
-(*       convention_eq back into source        *)
+(*       collapse back into source        *)
 (*       observational-inequality. What the    *)
 (*       target convention forbids every       *)
 (*       interaction to witness, the source    *)
@@ -59,7 +59,7 @@ Module Identity (D : ExistenceSig).
   (* Identity preserves convention trivially. *)
 
   Theorem id_preserves_convention :
-    forall a b, convention_eq a b -> convention_eq (id a) (id b).
+    forall a b, collapse a b -> collapse (id a) (id b).
   Proof. intros a b H. unfold id. exact H. Qed.
 
   (* Identity is faithful (image agreement = source
@@ -191,7 +191,7 @@ Module Make (D1 D2 : ExistenceSig).
   (*                                               *)
   (*  Core observation. Under an injective         *)
   (*  interact-preserving morphism, target         *)
-  (*  convention_eq forces source observational    *)
+  (*  collapse forces source observational    *)
   (*  inequality: no D1 viewpoint can witness      *)
   (*  agreement between a and b.                   *)
   (*                                               *)
@@ -201,7 +201,7 @@ Module Make (D1 D2 : ExistenceSig).
   (*  distinct as D1 allows. What classical math   *)
   (*  calls an "equivalence class identification"  *)
   (*  is, in this framework, exactly D2's          *)
-  (*  convention_eq sitting on top of D1's         *)
+  (*  collapse sitting on top of D1's         *)
   (*  observational inequality.                    *)
   (* ============================================= *)
 
@@ -209,12 +209,12 @@ Module Make (D1 D2 : ExistenceSig).
     forall phi,
       preserves_interact phi -> injective phi ->
       forall a b : D1.Entity,
-        D2.convention_eq (phi a) (phi b) ->
+        D2.collapse (phi a) (phi b) ->
         forall c : D1.Entity,
           D1.interact a c <> D1.interact b c.
   Proof.
     intros phi Hphi Hinj a b Hconv c Heq.
-    apply (D2.convention_not_derivable
+    apply (D2.interaction_cannot_witness_collapse
              (phi a) (phi b) Hconv (phi c)).
     apply (morphism_carries_agreement phi Hphi a b c Heq).
   Qed.
@@ -226,7 +226,7 @@ Module Make (D1 D2 : ExistenceSig).
     forall phi,
       preserves_interact phi -> injective phi ->
       forall a b : D1.Entity,
-        D2.convention_eq (phi a) (phi b) ->
+        D2.collapse (phi a) (phi b) ->
         a <> b.
   Proof.
     intros phi Hphi Hinj a b Hconv Heq.
@@ -240,7 +240,7 @@ Module Make (D1 D2 : ExistenceSig).
   (*  CONVENTION PRESERVATION                      *)
   (*                                               *)
   (*  Dual of convention reflection. Forward       *)
-  (*  direction — source convention_eq carries to  *)
+  (*  direction — source collapse carries to  *)
   (*  target. Unlike reflection (target → source,  *)
   (*  derivable from injective + preserves_interact*)
   (*  via morphism_carries_agreement), preservation*)
@@ -254,9 +254,9 @@ Module Make (D1 D2 : ExistenceSig).
   (*                                               *)
   (*  Note on framework scope: a bare              *)
   (*  preserves_convention proof cannot be         *)
-  (*  discharged at signature level — convention_eq*)
+  (*  discharged at signature level — collapse*)
   (*  is an opaque Parameter with no constructor.  *)
-  (*  Each instance's convention_eq has its own    *)
+  (*  Each instance's collapse has its own    *)
   (*  witness form, and the instance's morphism    *)
   (*  author proves preservation against that form.*)
   (* ============================================= *)
@@ -264,7 +264,7 @@ Module Make (D1 D2 : ExistenceSig).
   Definition preserves_convention
     (phi : D1.Entity -> D2.Entity) : Prop :=
     forall a b : D1.Entity,
-      D1.convention_eq a b -> D2.convention_eq (phi a) (phi b).
+      D1.collapse a b -> D2.collapse (phi a) (phi b).
 
   Definition full_morphism
     (phi : D1.Entity -> D2.Entity) : Prop :=
@@ -276,11 +276,11 @@ Module Make (D1 D2 : ExistenceSig).
   Theorem preserves_convention_distinct :
     forall phi a b,
       preserves_convention phi ->
-      D1.convention_eq a b ->
+      D1.collapse a b ->
       phi a <> phi b.
   Proof.
     intros phi a b Hpres Hconv Heq.
-    apply (D2.convention_not_derivable
+    apply (D2.interaction_cannot_witness_collapse
              (phi a) (phi b) (Hpres a b Hconv) (phi a)).
     rewrite <- Heq. reflexivity.
   Qed.
@@ -295,14 +295,14 @@ Module Make (D1 D2 : ExistenceSig).
     forall phi,
       preserves_interact phi -> injective phi ->
       forall a b c : D1.Entity,
-        D1.convention_eq a b ->
+        D1.collapse a b ->
         D2.interact (phi a) (phi c) <> D2.interact (phi b) (phi c).
   Proof.
     intros phi Hphi Hinj a b c Hconv Heq.
     rewrite <- (Hphi a c) in Heq.
     rewrite <- (Hphi b c) in Heq.
     apply Hinj in Heq.
-    exact (D1.convention_not_derivable a b Hconv c Heq).
+    exact (D1.interaction_cannot_witness_collapse a b Hconv c Heq).
   Qed.
 
   (* Projections from full_morphism. *)
@@ -575,7 +575,7 @@ Module Make (D1 D2 : ExistenceSig).
   (*  sided inverse psi. The inverse's interact    *)
   (*  preservation is automatic (derived below);   *)
   (*  convention preservation of the inverse is    *)
-  (*  NOT automatic, since convention_eq is opaque *)
+  (*  NOT automatic, since collapse is opaque *)
   (*  at signature level. A full iso bundles       *)
   (*  convention preservation in both directions.  *)
   (* ============================================= *)
@@ -633,7 +633,7 @@ Module Make (D1 D2 : ExistenceSig).
   (*  Iso bundled with convention preservation in  *)
   (*  both directions. Convention preservation is  *)
   (*  not derivable from interact-preserving       *)
-  (*  inverse (convention_eq is opaque), so it is  *)
+  (*  inverse (collapse is opaque), so it is  *)
   (*  explicit in the bundle.                      *)
   (* ============================================= *)
 
@@ -644,8 +644,8 @@ Module Make (D1 D2 : ExistenceSig).
       (forall a : D1.Entity, psi (phi a) = a) /\
       (forall b : D2.Entity, phi (psi b) = b) /\
       (forall b1 b2 : D2.Entity,
-         D2.convention_eq b1 b2 ->
-         D1.convention_eq (psi b1) (psi b2)).
+         D2.collapse b1 b2 ->
+         D1.collapse (psi b1) (psi b2)).
 
   Theorem full_iso_is_iso :
     forall phi, is_full_iso phi -> is_iso phi.
@@ -705,13 +705,13 @@ Module Compose (D1 D2 D3 : ExistenceSig).
   Theorem compose_preserves_convention :
     forall (psi : D2.Entity -> D3.Entity)
            (phi : D1.Entity -> D2.Entity),
-      (forall a b, D1.convention_eq a b ->
-                   D2.convention_eq (phi a) (phi b)) ->
-      (forall a b, D2.convention_eq a b ->
-                   D3.convention_eq (psi a) (psi b)) ->
+      (forall a b, D1.collapse a b ->
+                   D2.collapse (phi a) (phi b)) ->
+      (forall a b, D2.collapse a b ->
+                   D3.collapse (psi a) (psi b)) ->
       forall a b,
-        D1.convention_eq a b ->
-        D3.convention_eq (compose psi phi a) (compose psi phi b).
+        D1.collapse a b ->
+        D3.collapse (compose psi phi a) (compose psi phi b).
   Proof.
     intros psi phi Hphi Hpsi a b Hconv.
     unfold compose.

@@ -25,10 +25,10 @@ Require CauchyReal.
 
 Print Assumptions RationalRep.RationalRep.interact_self.
 
-(* RationalRep.RationalRep.convention_not_derivable — another
+(* RationalRep.RationalRep.interaction_cannot_witness_collapse — another
    framework axiom for RationalRep instance. *)
 
-Print Assumptions RationalRep.RationalRep.convention_not_derivable.
+Print Assumptions RationalRep.RationalRep.interaction_cannot_witness_collapse.
 
 (* CauchyReal.CauchyReal.cauchy_pointwise_distinct_convention —
    framework axiom instantiation for CauchyReal. *)

@@ -21,15 +21,15 @@ From Stdlib Require Import PeanoNat.
 From Stdlib Require Import Lia.
 
 Require Import Existence.
-Require Import Computable.
+Require Import Materialized.
 Require Import Iterable.
 
 (* ================================================ *)
-(*  FUNCTOR OVER ComputableExistenceSig              *)
+(*  FUNCTOR OVER MaterializedExistenceSig              *)
 (* ================================================ *)
 
-Module Attempt (C : ComputableExistenceSig).
-  Module CDT := ComputableExistenceTheory C.
+Module Attempt (C : MaterializedExistenceSig).
+  Module CDT := MaterializedExistenceTheory C.
   Module DT := ExistenceTheory C.
   Import C CDT DT.
 
@@ -531,7 +531,7 @@ Module Attempt (C : ComputableExistenceSig).
   (*  decision functions.                           *)
   (*                                                *)
   (*  Such counting is NOT captured by the          *)
-  (*  Computable axioms alone. It requires:         *)
+  (*  Materialized axioms alone. It requires:         *)
   (*                                                *)
   (*    1. A finite alphabet of interaction ops     *)
   (*       (instance-specific)                      *)
@@ -774,7 +774,7 @@ End Attempt.
 (*      Honest, but gives no lower bound.            *)
 (*                                                   *)
 (*    - remaining = Some n: the instance commits.    *)
-(*      By convention_eq, not by derivation. The     *)
+(*      By collapse, not by derivation. The     *)
 (*      framework accepts the commitment and forces  *)
 (*      any complete chain to spend at least n flip  *)
 (*      tokens (one per step, via flip_pays_work's   *)
@@ -790,7 +790,7 @@ End Attempt.
 (*  any instance that does commit.                   *)
 (* ================================================ *)
 
-Module IterableAttempt (I : IterableComputableSig).
+Module IterableAttempt (I : IterableMaterializedSig).
   Module Base := Attempt I.
   Module IT := IterableTheory I.
   Import I IT Base.
@@ -1084,14 +1084,14 @@ Qed.
 (*    only redistributed across steps.               *)
 (*                                                   *)
 (*  This section formalizes this within the          *)
-(*  ComputableExistenceSig framework. It does NOT    *)
+(*  MaterializedExistenceSig framework. It does NOT    *)
 (*  claim to prove P != NP. It establishes that      *)
 (*  within the framework's cost model, computation   *)
 (*  without payment is impossible.                   *)
 (* ================================================ *)
 
-Module TokenCapacity (C : ComputableExistenceSig).
-  Module TC_CDT := ComputableExistenceTheory C.
+Module TokenCapacity (C : MaterializedExistenceSig).
+  Module TC_CDT := MaterializedExistenceTheory C.
   Module TC_DT := ExistenceTheory C.
   Import C TC_CDT TC_DT.
 
